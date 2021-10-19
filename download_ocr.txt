@@ -1,0 +1,6 @@
+wget -q https://s3-us-west-2.amazonaws.com/static.pyimagesearch.com/opencv-text-detection/opencv-text-detection.zip
+unzip -qq opencv-text-detection.zip
+rm -rf opencv-text-detection.zip
+sudo apt install tesseract-ocr
+##python /content/opencv-text-detection/text_detection.py --image /content/opencv-text-detection/images/lebron_james.jpg \
+	--east /content/opencv-text-detection/frozen_east_text_detection.pb
