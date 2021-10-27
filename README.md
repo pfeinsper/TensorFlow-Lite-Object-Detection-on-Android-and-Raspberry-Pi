@@ -41,7 +41,7 @@ Hardware
 
 - Raspberry Pi 4 Model B
 - WebCam (USB)
-- EarPhones/HeadPhones (USB)
+- EarPhones/HeadPhones (Bluetooth)
 - Google Coral TPU (USB)
 - GPIO Hardware:
   - Protoboard
@@ -72,6 +72,16 @@ Installing VMobi Software
 ==========================
 
 On the Raspberry Pi 4:
+
+Make sure what is the Headphones' MAC address. To do that open a new terminal (CTRL+ALT+T) and write:
+```bash
+bluetoothctl scan on
+```
+![Getting device's MAC address](images/get_MAC_address.png)
+
+Get your device's MAC address (XX:XX:XX:XX:XX:XX) and edit VMobi-objetc-detection-raspberry-pi/btconnection.sh file updating the current MAC address:
+![Updating MAC address](images/bluetooth_script.png)
+
 
 Make sure you have Python version >= 3.7:
 
