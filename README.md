@@ -9,6 +9,7 @@ This project is a fork from [this github](https://github.com/EdjeElectronics/Ten
 - [Scope of the project](#scope-of-the-project)
 - [Hardware](#hardware)
 - [Installing the raspbian OS](#installing-the-raspbian-os)
+- [Getting Headphone's MAC address](#getting-headphones-mac-address)
 - [Installing VMobi Software](#installing-vmobi-software)
 - [Usage](#usage)
 
@@ -68,20 +69,22 @@ $ sudo time dd if=2021-05-07-raspios-buster-armhf.img of=/dev/mmcblk0 bs=4M conv
 
 Now you recorded the OS to an SD Card. By this you can eject the SD card and put it on the Raspberry Pi 4.
 
-Installing VMobi Software
+Getting Headphone's MAC address
 ==========================
-
 On the Raspberry Pi 4:
 
-Make sure what is the Headphones' MAC address. To do that open a new terminal (CTRL+ALT+T) and write:
+Make sure what is your Headphones' MAC address. To do that open a new terminal (CTRL+ALT+T) and write:
 ```bash
 bluetoothctl scan on
 ```
 ![Getting device's MAC address](images/get_MAC_address.png)
 
-Get your device's MAC address (XX:XX:XX:XX:XX:XX) and edit VMobi-objetc-detection-raspberry-pi/btconnection.sh file updating the current MAC address:
-![Updating MAC address](images/bluetooth_script.png)
+Get your device's MAC address (XX:XX:XX:XX:XX:XX) and save it, we will use it in the next steps.
 
+Installing VMobi Software
+==========================
+
+On the Raspberry Pi 4:
 
 Make sure you have Python version >= 3.7:
 
@@ -107,8 +110,11 @@ $ cd VMobi-objetc-detection-raspberry-pi
 $ sudo chmod +x install.sh
 ```
 
-And, without the Google Coral TPU connected to the hardware, run:
+Now, edit the btconnection.sh file updating with the MAC address that you saved in the last step:
+![Updating MAC address](images/bluetooth_script.png)
 
+
+And, without the Google Coral TPU connected to the hardware, run:
 ```
 $ sudo su
 $ ./install.sh
