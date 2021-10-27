@@ -106,14 +106,18 @@ class VMobi:
         categ = qmode.speech_recog()
         
         while categ == None or categ == "list" or categ == "least" or (categ not in self.categories):
+            print(categ)
             if categ == None:
                 qmode.repeat("category")
                 record_to_file("output.wav")
-            elif categ not in self.categories:
+            elif categ == "list" or categ == "least":
+                qmode.list_elements(self.categories)
+                categ = None
+            else:
+            #elif categ not in self.categories:
                 qmode.play_voice("Category not in dataset. Which category do you want?")
                 record_to_file("output.wav")
-            else:
-                qmode.list_categories(self.categories)
+                
                 
        #####  IMPLEMENTAR  ##########
        ##############################

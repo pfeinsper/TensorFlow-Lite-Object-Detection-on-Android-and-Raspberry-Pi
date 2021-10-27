@@ -22,6 +22,13 @@ sudo apt-get install libedgetpu1-std -y
 wget https://dl.google.com/coral/canned_models/mobilenet_ssd_v2_coco_quant_postprocess_edgetpu.tflite
 mv mobilenet_ssd_v2_coco_quant_postprocess_edgetpu.tflite Sample_TFLite_model/edgetpu.tflite
 
+# Give labelmap authorization
+chmod 777 Sample_TFLite_model/labelmap.txt
+
+# Bluetooth headphone connection
+chmod +x btconnection.sh
+crontab -l|sed "\$a@reboot ./VMobi-objetc-detection-raspberry-pi/btconnection.sh"|crontab -
+
 # Done!
 
 sudo reboot

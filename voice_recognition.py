@@ -6,8 +6,6 @@ from pydub.playback import play
 from gtts import gTTS
 from  recording import record_to_file
 
-moc = {"food": ["apple", "banana", "hamburguer", "strawberry"], "automobiles":["car", "motorcycle", "bicycle"]}
-
 class VoiceRecognition():
     def __init__(self, language="en"):
         self.language = language
@@ -31,7 +29,7 @@ class VoiceRecognition():
         list_elem = ""
         for item in list_e:
             list_elem += str(item) +", "
-        self.play_voice(list_elements)
+        self.play_voice(list_elem)
         
     def list_categories(self, dictionary):
         list_categories = ""
