@@ -19,8 +19,14 @@ sudo apt-get install -y flac
 # tflite installation
 pip3 install https://github.com/google-coral/pycoral/releases/download/v2.0.0/t$
 
-
-
+# OCR dependencies
+cd content
+wget https://github.com/pedromtelho/VMobi-ocr-dependencies/raw/master/east_model_float16.tflite
+cd opencv_text_detection
+wget https://github.com/pedromtelho/VMobi-ocr-dependencies/raw/master/frozen_east_text_detection.pb
+sudo apt install tesseract-ocr
+pip3 install pytesseract
+pip3 install autocorrect
 # Get packages required for TensorFlow
 # Using the tflite_runtime packages available at https://www.tensorflow.org/lite/guide/python
 # Will change to just 'pip3 install tensorflow' once newer versions of TF are added to piwheels

@@ -14,6 +14,8 @@ from voice_recognition import VoiceRecognition
 # TFLite detection
 from TFLite_detection_webcam import initialize_detector, safari_mode, query_mode
 
+# Text recognition
+from content.opencv_text_detection.text_detection import main_text_detection
 
 class VMobi:
     """Class that represents the system as a whole"""
@@ -59,8 +61,11 @@ class VMobi:
             if s > 0:
                 # Enter Query Mode
                 query_cat = self.query_mode_type2() # Get the category with the GPIO buttons
-                query_mode(detector_args, query_cat)
-                continue
+                if query_cat != 'text':
+                    query_mode(detector_args, query_cat)
+                    continue
+                else:
+                    continue
 
     def query_mode_selection(self):
         """[Type 1] Query mode that functions only with buttons"""
@@ -113,17 +118,15 @@ class VMobi:
             elif categ == "list" or categ == "least":
                 qmode.list_elements(self.categories)
                 categ = None
+            elif categ == 'text':
+                qmode.play_voice("Tou chose text category. Start recognizing")
+                main_text_detection()
+                return 'text'
             else:
             #elif categ not in self.categories:
                 qmode.play_voice("Category not in dataset. Which category do you want?")
                 record_to_file("output.wav")
                 
-                
-       #####  IMPLEMENTAR  ##########
-       ##############################
-       #if categ == 'text':         #
-       #     text_recognition_mode  #
-       # ############################
         play_voice(f"You chose the category: {categ}", self.lang)
         return categ
     """
