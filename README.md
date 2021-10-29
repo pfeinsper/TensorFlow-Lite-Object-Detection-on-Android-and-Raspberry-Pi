@@ -124,6 +124,17 @@ $ ./install.sh
 
 To use other models, download the `.tflite` file and move it to a new folder in the root directory of the project, named `'{Model Name}_model'` (Change `Model Name`).
 
+Verify if cronjob was set:
+```bash
+crontab -e
+```
+You should see in the last line:
+```bash
+@reboot ./Vmobi-objetc-detection-raspberry-pi/btconnetion.sh
+```
+If it won't there, add that line in the end of the file and save it.
+
+
 Usage
 ======
 
