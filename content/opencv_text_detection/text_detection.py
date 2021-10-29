@@ -12,7 +12,7 @@ import time
 import cv2
 import pytesseract
 from autocorrect import Speller
-import tensorflow as tf
+#import tensorflow as tf
 
 
 spell = Speller(fast=True)
