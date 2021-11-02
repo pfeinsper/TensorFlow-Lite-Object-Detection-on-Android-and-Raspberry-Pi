@@ -107,6 +107,7 @@ Then, run:
 ```sh
 $ git clone https://github.com/pfeinsper/VMobi-objetc-detection-raspberry-pi
 $ cd VMobi-objetc-detection-raspberry-pi
+$ git checkout dev-master
 $ sudo chmod +x install.sh
 ```
 
