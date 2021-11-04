@@ -1,6 +1,3 @@
-# USAGE
-# python text_detection.py --east frozen_east_text_detection.pb
-
 # import the necessary packages
 from imutils.video import VideoStream
 from imutils.video import FPS
@@ -12,13 +9,16 @@ import time
 import cv2
 import pytesseract
 from autocorrect import Speller
-#import tensorflow as tf
+from tflite_runtime.interpreter import Interpreter
+from tflite_runtime.interpreter import load_delegate
 
+from TFLite_detection_webcam import play_voice
 
 spell = Speller(fast=True)
 
 def perform_inference(tflite_path, preprocessed_image):
-    interpreter = tf.lite.Interpreter(model_path=tflite_path)
+    interpreter = Interpreter(model_path=tflite_path,
+                                experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
     input_details = interpreter.get_input_details()
 
     if input_details[0]["dtype"] == np.uint8:
@@ -107,129 +107,114 @@ def main_text_detection():
     (newW, newH) = (320, 320)
     (rW, rH) = (None, None)
 
-    # define the two output layer names for the EAST detector model that
-    # we are interested -- the first is the output probabilities and the
-    # second can be used to derive the bounding box coordinates of text
-    layerNames = [
-        "feature_fusion/Conv_7/Sigmoid",
-        "feature_fusion/concat_3"]
-
-    # load the pre-trained EAST text detector
-    print("[INFO] loading EAST text detector...")
-    net = cv2.dnn.readNet("frozen_east_text_detection.pb")
-
-    # if a video path was not supplied, grab the reference to the web cam
 
     print("[INFO] starting video stream...")
     # define camera source number
-    vs = VideoStream(src=1).start()
+    vs = VideoStream(src=0).start()
     time.sleep(1.0)
-
 
     # start the FPS throughput estimator
     fps = FPS().start()
-
+    
+    t0 = time.time()
     # loop over frames from the video stream
     while True:
-        # grab the current frame, then handle if we are using a
-        # VideoStream or VideoCapture object
-        frame = vs.read()
+        if (time.time() - t0) <= 2:
+            # grab the current frame, then handle if we are using a
+            # VideoStream or VideoCapture object
+            frame = vs.read()
 
-        # check to see if we have reached the end of the stream
-        if frame is None:
-            break
+            # check to see if we have reached the end of the stream
+            if frame is None:
+                break
 
-        # resize the frame, maintaining the aspect ratio
-        frame = imutils.resize(frame, width=1000)
-        orig = frame.copy()
+            # resize the frame, maintaining the aspect ratio
+            frame = imutils.resize(frame, width=1000)
+            orig = frame.copy()
 
-        # if our frame dimensions are None, we still need to compute the
-        # ratio of old frame dimensions to new frame dimensions
-        if W is None or H is None:
+            # if our frame dimensions are None, we still need to compute the
+            # ratio of old frame dimensions to new frame dimensions
+            if W is None or H is None:
+                (H, W) = frame.shape[:2]
+                rW = W / float(newW)
+                rH = H / float(newH)
+
+            # resize the frame, this time ignoring aspect ratio
+            frame = cv2.resize(frame, (newW, newH))
+
             (H, W) = frame.shape[:2]
-            rW = W / float(newW)
-            rH = H / float(newH)
 
-        # resize the frame, this time ignoring aspect ratio
-        frame = cv2.resize(frame, (newW, newH))
+            # convert the frame to a floating point data type and perform mean
+            # subtraction
+            frame = frame.astype("float32")
+            mean = np.array([123.68, 116.779, 103.939][::-1], dtype="float32")
+            frame -= mean
+            frame = np.expand_dims(frame, 0)
 
-        (H, W) = frame.shape[:2]
+            scores, geometry = perform_inference(tflite_path="/home/pi/VMobi-objetc-detection-raspberry-pi/content/east_model_float16.tflite",
+                                                 preprocessed_image=frame)
 
-        # convert the frame to a floating point data type and perform mean
-        # subtraction
-        frame = frame.astype("float32")
-        mean = np.array([123.68, 116.779, 103.939][::-1], dtype="float32")
-        frame -= mean
-        frame = np.expand_dims(frame, 0)
+            scores = np.transpose(scores, (0, 3, 1, 2))
+            geometry = np.transpose(geometry, (0, 3, 1, 2))
 
-        scores, geometry = perform_inference(tflite_path=f'east_model_float16.tflite',
-                                             preprocessed_image=frame)
+            # decode the predictions, then  apply non-maxima suppression to
+            # suppress weak, overlapping bounding boxes
+            (rects, confidences) = decode_predictions(scores, geometry)
+            boxes = non_max_suppression(np.array(rects), probs=confidences)
 
-        scores = np.transpose(scores, (0, 3, 1, 2))
-        geometry = np.transpose(geometry, (0, 3, 1, 2))
+            results = []
+            # loop over the bounding boxes
+            for (startX, startY, endX, endY) in boxes:
+                # scale the bounding box coordinates based on the respective
+                # ratios
+                startX = int(startX * rW)
+                startY = int(startY * rH)
+                endX = int(endX * rW)
+                endY = int(endY * rH)
 
-        # construct a blob from the frame and then perform a forward pass
-        # of the model to obtain the two output layer sets
-        # blob = cv2.dnn.blobFromImage(frame, 1.0, (newW, newH),
-        #                              (123.68, 116.78, 103.94), swapRB=True, crop=False)
-        # net.setInput(blob)
-        # (scores, geometry) = net.forward(layerNames)
+                # # in order to obtain a better OCR of the text we can potentially
+                # # apply a bit of padding surrounding the bounding box -- here we
+                # # are computing the deltas in both the x and y directions
+                # dX = int((endX - startX) * -0.05)  # padding
+                # dY = int((endY - startY) * 0.14)  # padding
+                # # apply padding to each side of the bounding box, respectively
+                # startX = max(0, startX - dX)
+                # startY = max(0, startY - dY)
+                # endX = min(origW, endX + (dX * 2))
+                # endY = min(origH, endY + (dY * 2))
+                # extract the actual padded ROI
+                roi = orig[startY:endY, startX:endX]
+                try:
+                    # in order to apply Tesseract v4 to OCR text we must supply
+                    # (1) a language, (2) an OEM flag of 4, indicating that the we
+                    # wish to use the LSTM neural net model for OCR, and finally
+                    # (3) an OEM value, in this case, 7 which implies that we are
+                    # treating the ROI as a single line of text
+                    config = ("-l eng --oem 1 --psm 7")
+                    text = pytesseract.image_to_string(roi, config=config)
 
-        # decode the predictions, then  apply non-maxima suppression to
-        # suppress weak, overlapping bounding boxes
-        (rects, confidences) = decode_predictions(scores, geometry)
-        boxes = non_max_suppression(np.array(rects), probs=confidences)
-        # (origH, origW) = frame.shape[:2]
-        results = []
-        # loop over the bounding boxes
-        for (startX, startY, endX, endY) in boxes:
-            # scale the bounding box coordinates based on the respective
-            # ratios
-            startX = int(startX * rW)
-            startY = int(startY * rH)
-            endX = int(endX * rW)
-            endY = int(endY * rH)
+                    print("OCR TEXT VERIFICATION")
 
-            # # in order to obtain a better OCR of the text we can potentially
-            # # apply a bit of padding surrounding the bounding box -- here we
-            # # are computing the deltas in both the x and y directions
-            # dX = int((endX - startX) * -0.05)  # padding
-            # dY = int((endY - startY) * 0.14)  # padding
-            # # apply padding to each side of the bounding box, respectively
-            # startX = max(0, startX - dX)
-            # startY = max(0, startY - dY)
-            # endX = min(origW, endX + (dX * 2))
-            # endY = min(origH, endY + (dY * 2))
-            # extract the actual padded ROI
-            roi = orig[startY:endY, startX:endX]
+                    text = text.lower()
+                    
+                    text = spell(text)
+                    play_voice(text)
+                    # add the bounding box coordinates and OCR'd text to the list
+                    # of results
+                    results.append(((startX, startY, endX, endY), text))
+                    # sort the results bounding box coordinates from top to bottom
 
-            # in order to apply Tesseract v4 to OCR text we must supply
-            # (1) a language, (2) an OEM flag of 4, indicating that the we
-            # wish to use the LSTM neural net model for OCR, and finally
-            # (3) an OEM value, in this case, 7 which implies that we are
-            # treating the ROI as a single line of text
-            config = ("-l eng --oem 1 --psm 7")
-            text = pytesseract.image_to_string(roi, config=config)
+                    results = sorted(results, key=lambda r: r[0][1])
+                    # loop over the results
+                    for ((startX, startY, endX, endY), text) in results:
 
-            print("OCR TEXT VERIFICATION")
-
-            text = text.lower()
-            print("Antes: "+ text)
-            text = spell(text)
-            print("Depois: "+text)
-            # add the bounding box coordinates and OCR'd text to the list
-            # of results
-            results.append(((startX, startY, endX, endY), text))
-            # sort the results bounding box coordinates from top to bottom
-
-            results = sorted(results, key=lambda r: r[0][1])
-            # loop over the results
-            for ((startX, startY, endX, endY), text) in results:
-
-                # draw the bounding box on the frame
-                cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
-
-                # update the FPS counter
+                        # draw the bounding box on the frame
+                        cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
+                except Exception as e:
+                    print(e)
+            else:
+                t0 = time.time()
+        # update the FPS counter
         fps.update()
 
         # show the output frame
