@@ -31,4 +31,4 @@ crontab -l|sed "\$a@reboot ./VMobi-objetc-detection-raspberry-pi/btconnection.sh
 
 # Done!
 
-#sudo reboot
+sudo reboot
