@@ -121,7 +121,7 @@ class VMobi:
                 qmode.list_elements(self.categories)
                 categ = None
             elif categ == 'text':
-                qmode.play_voice("Tou chose text category. Start recognizing")
+                qmode.play_voice("You chose text category. Start recognizing")
                 
                 return 'text'
             else:

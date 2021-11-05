@@ -110,7 +110,7 @@ def main_text_detection():
 
     print("[INFO] starting video stream...")
     # define camera source number
-    vs = VideoStream(src=0).start()
+    vs = VideoStream().start()
     time.sleep(1.0)
 
     # start the FPS throughput estimator

@@ -172,7 +172,7 @@ def safari_mode(args, query_button):
 
 def query_mode(args, query_obj):
     """Runs the query mode"""
-    interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels = args
+    interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels, video_device = args
 
     # Initialize frame rate calculation
     frame_rate_calc = 1
