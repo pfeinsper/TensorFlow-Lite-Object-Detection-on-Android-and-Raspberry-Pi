@@ -49,7 +49,7 @@ class VMobi:
 
         # Conect button on GPIO2 and Ground
         # Watch out for connenctions in 'pin_layout.svg'
-        self.query_button = Button(2)
+        self.query_button = Button(2, hold_time=2)
 
         # Running the safari mode to run on the background
         # thread_safari_mode = threading.Thread(target=initialize_detector, args=(self.args,))
@@ -62,10 +62,10 @@ class VMobi:
                 # Enter Query Mode
                 query_cat = self.query_mode_type2() # Get the category with the GPIO buttons
                 if query_cat == 'text':
-                    main_text_detection()
+                    main_text_detection(self.query_button)
                     break
                 else:
-                    query_mode(detector_args, query_cat)
+                    query_mode(detector_args, query_cat, query_btn=self.query_button)
                     continue
 
 

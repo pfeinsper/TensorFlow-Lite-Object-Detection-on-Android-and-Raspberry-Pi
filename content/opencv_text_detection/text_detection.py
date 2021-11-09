@@ -100,7 +100,7 @@ def decode_predictions(scores, geometry):
 
 
 
-def main_text_detection():
+def main_text_detection(query_button = None):
     # initialize the original frame dimensions, new frame dimensions,
     # and ratio between the dimensions
     (W, H) = (None, None)
@@ -222,7 +222,7 @@ def main_text_detection():
         key = cv2.waitKey(1) & 0xFF
 
         # if the `q` key was pressed, break from the loop
-        if key == ord("q"):
+        if key == ord("q") or query_button.is_held:
             break
 
     # stop the timer and display FPS information

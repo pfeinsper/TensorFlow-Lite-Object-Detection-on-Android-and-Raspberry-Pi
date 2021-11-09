@@ -170,7 +170,7 @@ def safari_mode(args, query_button):
     # if t.do_run:
     #     t.do_run = False
 
-def query_mode(args, query_obj):
+def query_mode(args, query_obj, query_btn):
     """Runs the query mode"""
     interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels, video_device = args
 
@@ -252,7 +252,7 @@ def query_mode(args, query_obj):
         frame_rate_calc= 1/time1
 
         # Press 'q' to quit
-        if cv2.waitKey(1) == ord('q') or breakFlag:
+        if cv2.waitKey(1) == ord('q') or breakFlag or query_btn.is_held:
             break
 
     # Clean up
