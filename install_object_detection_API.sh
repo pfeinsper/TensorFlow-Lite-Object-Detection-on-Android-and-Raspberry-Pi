@@ -9,14 +9,8 @@ git clone https://github.com/tensorflow/models.git
 
 cd models/research
 
-git clone https://github.com/cocodataset/cocoapi.git
-
-cd cocoapi/PythonAPI
-python setup.py build_ext --inplace
-python setup.py build_ext install
-cd ../..
-
-cp -r pycocotools .
+pip3 install cython
+pip3 install git+https://github.com/philferriere/cocoapi.git#subdirectory=PythonAPI
 
 # Compile protos.
 sudo apt install protobuf-compiler -y
