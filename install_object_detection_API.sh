@@ -1,8 +1,8 @@
-pip uninstall tensorflow -y
-pip uninstall keras -y 
+pip3 uninstall tensorflow -y
+pip3 uninstall keras -y 
 
-pip install tensorflow==2.6.0
-pip install keras==2.6.0
+pip3 install tensorflow==2.6.0
+pip3 install keras==2.6.0
 
 git clone https://github.com/tensorflow/models.git
 

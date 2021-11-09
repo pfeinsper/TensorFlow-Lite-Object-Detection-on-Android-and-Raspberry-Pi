@@ -11,9 +11,9 @@ from object_detection.utils import visualization_utils as viz_utils
 from object_detection.builders import model_builder
 
 # PATHS
-PATH_TO_CKPT = 'Transfer saved_model\my_model\checkpoint'
-PATH_TO_CFG = 'Transfer saved_model\my_model\pipeline.config'
-PATH_TO_LABELS = 'Transfer saved_model\label_map.pbtxt'
+PATH_TO_CKPT = '/home/fontes/Documents/Transfer saved_model/my_model/checkpoint'
+PATH_TO_CFG = '/home/fontes/Documents/Transfer saved_model/my_model/pipeline.config'
+PATH_TO_LABELS = '/home/fontes/Documents/Transfer saved_model/label_map.pbtxt'
 
 tf.get_logger().setLevel('ERROR')           # Suppress TensorFlow logging (2)
 
@@ -45,12 +45,13 @@ def detect_fn(image):
 category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
 
 # Camera setup
+print("Turning on camera...")
 cap = cv2.VideoCapture(0)
 
 while True:
     # Read frame from camera
     ret, image_np = cap.read()
-
+    print('Capturing frame')
     # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
     image_np_expanded = np.expand_dims(image_np, axis=0)
 
