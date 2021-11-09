@@ -1,3 +1,6 @@
+sudo apt update
+sudo apt upgrade
+
 pip3 uninstall tensorflow -y
 pip3 install tensorflow==2.6.0
 
