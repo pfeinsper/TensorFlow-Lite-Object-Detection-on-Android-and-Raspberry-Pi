@@ -1,9 +1,6 @@
 sudo apt update
 sudo apt upgrade
 
-pip3 uninstall tensorflow -y
-pip3 install tensorflow==2.6.0
-
 pip3 uninstall keras -y 
 pip3 install keras==2.6.0
 
