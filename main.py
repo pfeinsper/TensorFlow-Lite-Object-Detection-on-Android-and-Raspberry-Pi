@@ -5,39 +5,28 @@ import os, time, argparse
 from gpiozero import Button
 
 # Audio
-from gtts import gTTS
-from pydub import AudioSegment
-from pydub.playback import play
-from recording import record_to_file
-from voice_recognition import VoiceRecognition
+from play_voice import play_voice
+from audio_recognition.recording import record_to_file
+from audio_recognition.voice_recognition import VoiceRecognition
 
 # TFLite detection
 from TFLite_detection_webcam import initialize_detector, safari_mode, query_mode
 
 # Text recognition
-from content.opencv_text_detection.text_detection import main_text_detection
+from text_recognition.opencv_text_detection.text_detection import main_text_detection
 
 class VMobi:
     """Class that represents the system as a whole"""
 
     def __init__(self, args, lang = "en"):
-        self.args = args # Saving arguments on a variable
+        self.args = args # Saving arguments
         self.MODEL_DIR = args.modeldir # Directory of the .tflite file and names file
-        self.RESOLUTION = args.resolution # Camera resolution as in pixels 
+        self.RESOLUTION = args.resolution # Camera resolution in pixels
         self.USE_EDGETPU = args.edgetpu # Flag to use the google coral tpu
         self.lang = lang # Language used on tts speech voice
-
+        self.east_model_path = "/home/pi/VMobi-objetc-detection-raspberry-pi/text_recognition/east_model_float16.tflite" # EAST .tflite path for text recognition
         self.main() # Runs on the raspberry with buttons on the GPIO
-        # self.test() # Function to test tts on PC
 
-    def test(self):
-        categories = self.get_all_categories()
-        print(categories)
-        time.sleep(1)
-        print("Now playing the audio")
-        play_voice("Query mode activaded. Which category do you want?", self.lang)
-        for cat in categories:
-            play_voice(cat, self.lang)
 
     def main(self):
         """Main function that orchestrates the product"""
@@ -60,96 +49,41 @@ class VMobi:
             s = safari_mode(detector_args, self.query_button)
             if s > 0:
                 # Enter Query Mode
-                query_cat = self.query_mode_type2() # Get the category with the GPIO buttons
+                query_cat = self.query_mode_voice_type() # Get the category with voice command
                 if query_cat == 'text':
-                    main_text_detection(self.query_button)
-                    break
+                    main_text_detection(self.east_model_path, self.query_button)
+                    continue
                 else:
                     query_mode(detector_args, query_cat, query_btn=self.query_button)
                     continue
-
-
-    def query_mode_selection(self):
-        """[Type 1] Query mode that functions only with buttons"""
-        up_button = Button(18) # GPIO18 -> Up button
-        down_button = Button(23) # GPIO23 -> Down Button
-        print("Entering query mode only with buttons. (Type 1)")
-        play_voice("Query mode activaded. Which category do you want?", self.lang)
-        selection = None
-
-        index = 0
-        play_voice(self.categories[index], self.lang) # To read first category
-        while True:
-            if (self.query_button.is_pressed or up_button.is_pressed or down_button.is_pressed):
-                if up_button.is_pressed:
-                    if (index + 1 >= len(self.categories)):
-                        index = 0
-                        continue
-                    print("Up Button was pressed!")
-                    index += 1
-                if down_button.is_pressed:
-                    if (index - 1 < 0):
-                        index = len(self.categories) - 1
-                        continue
-                    print("Down Button was pressed!")
-                    index -= 1
-                if self.query_button.is_pressed:
-                    # User choosed the category self.categories[index]
-                    selection = self.categories[index]
-                    print("Query Button was pressed!")
-                    break
-                play_voice(self.categories[index], self.lang)
-        
-        play_voice(f"You chose the category: {selection}", self.lang)
-        return selection
             
 
-    def query_mode_type2(self):
+    def query_mode_voice_type(self):
         """Query  mode that uses voice recognition and only the query button"""
         print("Entering query mode with voice recognition. (Type 2)")
         qmode = VoiceRecognition()
         qmode.greetings()
-        record_to_file("output.wav")
+        record_to_file("audio_recognition/output.wav")
         categ = qmode.speech_recog()
         
         while categ == None or categ == "list" or categ == "least" or (categ not in self.categories):
             print(categ)
             if categ == None:
                 qmode.repeat("category")
-                record_to_file("output.wav")
+                record_to_file("audio_recognition/output.wav")
             elif categ == "list" or categ == "least":
                 qmode.list_elements(self.categories)
                 categ = None
             elif categ == 'text':
-                qmode.play_voice("You chose text category. Start recognizing")
-                
+                play_voice("You chose text category. Start recognizing")
                 return 'text'
             else:
-            #elif categ not in self.categories:
-                qmode.play_voice("Category not in dataset. Which category do you want?")
-                record_to_file("output.wav")
+                play_voice("Category not in dataset. Which category do you want?")
+                record_to_file("audio_recognition/output.wav")
                 
         play_voice(f"You chose the category: {categ}", self.lang)
         return categ
-    """
-        qmode.play_voice("Category {} selected. Which element do you want?".format(categ))
-        record_to_file("output.wav")
-        element = qmode.speech_recog()
-
-        while element == None or element == "list" or element == "least" or (element not in moc[categ]):
-            print(element)
-            if element == None:
-                qmode.repeat("element")
-                record_to_file("output.wav")
-            elif element not in moc[category]:
-                qmode.play_voice("Element not in category. Which element do you want?")
-                record_to_file("output.wav")
-            else:
-                qmode.list_elements(moc[element])
-                
-        qmode.play_voice("Start detecting element {}".format(element))
-        play_voice("Query mode activaded. Which category do you want?", self.lang)
-"""
+    
 
     def get_all_categories(self):
         """Function that get all available categories from model '.name' file"""
@@ -167,14 +101,6 @@ class VMobi:
             cat.append(line.replace("\n", ""))
         return cat
 
-def play_voice(mText, lang="en"):
-        """Function used to play the string 'mText' in audio using tts"""
-        print(f"[play_voice] now playing: '{mText}'")
-        tts_audio = gTTS(text=mText, lang=lang, slow=False)
-
-        tts_audio.save("voice.wav")
-        play(AudioSegment.from_file("voice.wav"))
-        os.remove("voice.wav")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

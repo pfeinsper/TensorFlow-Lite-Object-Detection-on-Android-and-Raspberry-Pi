@@ -24,9 +24,7 @@ from threading import Thread
 import importlib.util
 
 # Audio Setup
-from gtts import gTTS
-from pydub import AudioSegment
-from pydub.playback import play
+from play_voice import play_voice
 
 # GPIO - Pi Buttons
 from gpiozero import Button
@@ -78,7 +76,6 @@ def safari_mode(args, query_button):
     """Runs the Safari Mode; args is a tuple"""
     interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels = args
 
-    # t = threading.currentThread()
     # Initialize frame rate calculation
     frame_rate_calc = 1
     freq = cv2.getTickFrequency()
@@ -115,7 +112,6 @@ def safari_mode(args, query_button):
         boxes = interpreter.get_tensor(output_details[0]['index'])[0] # Bounding box coordinates of detected objects
         classes = interpreter.get_tensor(output_details[1]['index'])[0] # Class index of detected objects
         scores = interpreter.get_tensor(output_details[2]['index'])[0] # Confidence of detected objects
-        #num = interpreter.get_tensor(output_details[3]['index'])[0]  # Total number of detected objects (inaccurate and not needed)
 
         # Loop over all detections and draw detection box if confidence is above minimum threshold
         for i in range(len(scores)):
@@ -172,7 +168,7 @@ def safari_mode(args, query_button):
 
 def query_mode(args, query_obj, query_btn):
     """Runs the query mode"""
-    interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels, video_device = args
+    interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels = args
 
     # Initialize frame rate calculation
     frame_rate_calc = 1
@@ -210,7 +206,6 @@ def query_mode(args, query_obj, query_btn):
         boxes = interpreter.get_tensor(output_details[0]['index'])[0] # Bounding box coordinates of detected objects
         classes = interpreter.get_tensor(output_details[1]['index'])[0] # Class index of detected objects
         scores = interpreter.get_tensor(output_details[2]['index'])[0] # Confidence of detected objects
-        #num = interpreter.get_tensor(output_details[3]['index'])[0]  # Total number of detected objects (inaccurate and not needed)
 
         # Loop over all detections and draw detection box if confidence is above minimum threshold
         for i in range(len(scores)):
@@ -253,12 +248,12 @@ def query_mode(args, query_obj, query_btn):
 
         # Press 'q' to quit
         if cv2.waitKey(1) == ord('q') or breakFlag or query_btn.is_held:
+            play_voice("Returning to Safari Mode")
             break
 
     # Clean up
     cv2.destroyAllWindows()
     videostream.stop()
-    # t.do_run = False
 
 def initialize_detector(args):
     MODEL_NAME = args.modeldir
@@ -329,42 +324,6 @@ def initialize_detector(args):
     input_std = 127.5
     args = (interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels)
     return args
-    # if (is_safari and query_cat is None):
-    #     print("Initializing Safari Mode")
-    #     safari_mode(interpreter, imW, imH, width, height, floating_model, input_mean, 
-    #             input_std, input_details, output_details, min_conf_threshold, labels)
-    # elif (query_cat is not None and not is_safari):
-    #     print("Initializing Query Mode")
-    #     query_mode(interpreter, imW, imH, width, height, floating_model, input_mean, 
-    #             input_std, input_details, output_details, min_conf_threshold, labels, query_cat)
-    # else:
-    #     raise KeyError(f"Query category is not none ({query_cat}) and is_safari flag is activated")
 
-def play_voice(mText, lang="en"):
-    """Function used to play the string 'mText' in audio using tts"""
-    print(f"[play_voice] now playing: '{mText}'")
-    tts_audio = gTTS(text=mText, lang=lang, slow=False)
 
-    tts_audio.save("voice.wav")
-    play(AudioSegment.from_file("voice.wav"))
-    os.remove("voice.wav")
         
-if __name__ == '__main__':
-    # Define and parse input arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--modeldir', help='Folder the .tflite file is located in',
-                        required=True)
-    parser.add_argument('--graph', help='Name of the .tflite file, if different than detect.tflite',
-                        default='detect.tflite')
-    parser.add_argument('--labels', help='Name of the labelmap file, if different than labelmap.txt',
-                        default='labelmap.txt')
-    parser.add_argument('--threshold', help='Minimum confidence threshold for displaying detected objects',
-                        default=0.5)
-    parser.add_argument('--resolution', help='Desired webcam resolution in WxH. If the webcam does not support the resolution entered, errors may occur.',
-                        default='1280x720')
-    parser.add_argument('--edgetpu', help='Use Coral Edge TPU Accelerator to speed up detection',
-                        action='store_true')
-
-    args = parser.parse_args()
-
-    initialize_detector(args)

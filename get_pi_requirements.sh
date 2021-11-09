@@ -20,7 +20,7 @@ sudo apt-get install -y flac
 pip3 install https://github.com/google-coral/pycoral/releases/download/v2.0.0/tflite_runtime-2.5.0.post1-cp37-cp37m-linux_armv7l.whl
 
 # OCR dependencies
-cd content
+cd text_recognition
 wget https://github.com/pedromtelho/VMobi-ocr-dependencies/raw/master/east_model_float16.tflite
 sudo apt install -y tesseract-ocr
 pip3 install pytesseract
