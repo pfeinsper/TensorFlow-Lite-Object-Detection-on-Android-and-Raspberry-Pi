@@ -83,7 +83,7 @@ def safari_mode(args, query_button):
     # Initialize video stream
     videostream = VideoStream(resolution=(imW,imH),framerate=30).start()
     time.sleep(1)
-
+    play_voice("Safari mode is activated")
     #for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
     out = 0
     while True:
@@ -125,7 +125,7 @@ def safari_mode(args, query_button):
                 
                 cv2.rectangle(frame, (xmin,ymin), (xmax,ymax), (10, 255, 0), 2)
 
-                if (scores[i] > 0.9):
+                if (scores[i] > 0.8):
                     if ((xmin + xmax)/2 > imW/2):
                         play_voice(f"{object_name} at your right")
                     elif ((xmin + xmax)/2 < imW/2):

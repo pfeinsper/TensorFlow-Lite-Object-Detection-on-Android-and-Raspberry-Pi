@@ -71,6 +71,7 @@ class VMobi:
             if categ == None:
                 qmode.repeat("category")
                 record_to_file("audio_recognition/output.wav")
+                categ = qmode.speech_recog()
             elif categ == "list" or categ == "least":
                 qmode.list_elements(self.categories)
                 categ = None

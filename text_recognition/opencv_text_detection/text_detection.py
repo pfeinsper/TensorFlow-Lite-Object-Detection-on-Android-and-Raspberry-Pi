@@ -213,6 +213,7 @@ def main_text_detection(east_model_path, query_button = None):
 
         # if the `q` key was pressed, break from the loop
         if key == ord("q") or query_button.is_held:
+            play_voice("Returning to Safari Mode")
             break
 
     # stop the timer and display FPS information
