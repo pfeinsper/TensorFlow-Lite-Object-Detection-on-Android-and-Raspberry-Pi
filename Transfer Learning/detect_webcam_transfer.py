@@ -11,9 +11,9 @@ from object_detection.utils import visualization_utils as viz_utils
 from object_detection.builders import model_builder
 
 # PATHS
-PATH_TO_CKPT = '/home/fontes/Documents/Transfer saved_model/my_model/checkpoint'
-PATH_TO_CFG = '/home/fontes/Documents/Transfer saved_model/my_model/pipeline.config'
-PATH_TO_LABELS = '/home/fontes/Documents/Transfer saved_model/label_map.pbtxt'
+PATH_TO_CKPT = 'RealTimeObjectDetection/Tensorflow/workspace/exported_models/my_model/checkpoint'
+PATH_TO_CFG = 'RealTimeObjectDetection/Tensorflow/workspace/exported_models/my_model/pipeline.config'
+PATH_TO_LABELS = 'RealTimeObjectDetection/Tensorflow/workspace/annotations/label_map.pbtxt'
 
 tf.get_logger().setLevel('ERROR')           # Suppress TensorFlow logging (2)
 
