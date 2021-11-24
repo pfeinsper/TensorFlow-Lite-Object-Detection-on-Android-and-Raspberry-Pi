@@ -11,8 +11,8 @@ from object_detection.utils import visualization_utils as viz_utils
 from object_detection.builders import model_builder
 
 # PATHS
-PATH_TO_CKPT = 'RealTimeObjectDetection/Tensorflow/workspace/exported_models/my_model/checkpoint'
-PATH_TO_CFG = 'RealTimeObjectDetection/Tensorflow/workspace/exported_models/my_model/pipeline.config'
+PATH_TO_CKPT = 'RealTimeObjectDetection/Tensorflow/workspace/exported_models/custom_MCdonald_model/checkpoint'
+PATH_TO_CFG = 'RealTimeObjectDetection/Tensorflow/workspace/exported_models/custom_MCdonald_model/pipeline.config'
 PATH_TO_LABELS = 'RealTimeObjectDetection/Tensorflow/workspace/annotations/label_map.pbtxt'
 
 tf.get_logger().setLevel('ERROR')           # Suppress TensorFlow logging (2)
@@ -51,7 +51,6 @@ cap = cv2.VideoCapture(0)
 while True:
     # Read frame from camera
     ret, image_np = cap.read()
-    print('Capturing frame')
     # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
     image_np_expanded = np.expand_dims(image_np, axis=0)
 
@@ -77,7 +76,7 @@ while True:
           category_index,
           use_normalized_coordinates=True,
           max_boxes_to_draw=200,
-          min_score_thresh=.30,
+          min_score_thresh=.80,
           agnostic_mode=False)
 
     # Display output
