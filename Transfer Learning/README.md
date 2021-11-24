@@ -15,10 +15,10 @@ Open the `install_object_detection_API.sh` file with your prefered software.
 copy and paste the instructions line by line inside a command prompt. It has to be inside the `Transfer\ Learning/` directory.
 
 ## Linux
-In a terminal inside `Transfer\ Learning/` directory, run:
+In a terminal inside this directory, run:
 
 ```
-sudo bash Transfer\ Learning/install_object_detection_API.sh
+sudo bash install_object_detection_API.sh
 ```
 
 After running the script, you must have the following output:
