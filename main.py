@@ -24,7 +24,7 @@ class VMobi:
         self.RESOLUTION = args.resolution # Camera resolution in pixels
         self.USE_EDGETPU = args.edgetpu # Flag to use the google coral tpu
         self.lang = lang # Language used on tts speech voice
-        self.east_model_path = "/home/pi/VMobi-objetc-detection-raspberry-pi/text_recognition/east_model_float16.tflite" # EAST .tflite path for text recognition
+        self.east_model_path = os.getcwd() + "/text_recognition/east_model_float16.tflite" # EAST .tflite path for text recognition
         self.main() # Runs on the raspberry with buttons on the GPIO
 
 
