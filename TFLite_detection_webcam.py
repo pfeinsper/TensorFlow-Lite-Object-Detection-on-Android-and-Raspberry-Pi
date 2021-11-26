@@ -127,12 +127,12 @@ def safari_mode(args, query_button):
                 
                 object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
                 if (scores[i] > 0.8):
-                    if ((xmin + xmax)/2 > imW/2):
+                    if ((xmin + xmax)/2 > 2*imW/3):
                         play_voice(f"{object_name} at your right")
-                    elif ((xmin + xmax)/2 < imW/2):
+                    elif ((xmin + xmax)/2 < imW/3):
                         play_voice(f"{object_name} at your left")
                     else:
-                        play_voice(f"{object_name} in your way")
+                        play_voice(f"{object_name} in front of you")
 
                 # Draw label
                 
@@ -229,7 +229,13 @@ def query_mode(args, query_obj, query_btn):
                 cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
                 if (object_name == query_obj):
                     if (counter >= 5):
-                        play_voice(f"Found the {query_obj}")
+                        play_voice(f"")
+                        if ((xmin + xmax)/2 > 2*imW/3):
+                            play_voice(f"Found the {query_obj}! It is at your right.")
+                        elif ((xmin + xmax)/2 < imW/3):
+                            play_voice(f"Found the {query_obj}! It is at your left.")
+                        else:
+                            play_voice(f"Found the {query_obj}! It is in front of you.")
                         breakFlag = True
                         break
                     counter += 1
