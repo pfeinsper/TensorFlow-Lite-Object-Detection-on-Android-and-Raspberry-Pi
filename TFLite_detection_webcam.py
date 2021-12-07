@@ -84,7 +84,7 @@ def safari_mode(args, query_button):
     videostream = VideoStream(resolution=(imW,imH),framerate=30).start()
     time.sleep(1)
     # play_voice("Safari mode is activated")
-    subprocess.Popen(["python3", "play_voice.py", "--text='Safari mode is activated'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+    subprocess.Popen(["python3", "play_voice.py", "--text='Safari mode is activated'"], shell=True, stdin=None, stdout=True, stderr=None, close_fds=True)
     #for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
     out = 0
     while True:
