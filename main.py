@@ -123,5 +123,5 @@ if __name__ == '__main__':
     parser.add_argument('--safari', help='Start Safari Mode', action='store_true')
     parser.add_argument('--query', help='Start Query Mode', default='?')
 
-
+    args = parser.parse_args()
     helper = VMobi(args)
