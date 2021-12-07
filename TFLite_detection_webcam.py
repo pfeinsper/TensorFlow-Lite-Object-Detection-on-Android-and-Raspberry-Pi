@@ -184,7 +184,7 @@ def query_mode(args, query_obj, query_btn):
     time.sleep(1)
 
     #for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
-    counter = 0
+    # counter = 0
     breakFlag = False
     while True:
         # Start timer (for calculating frame rate)
@@ -232,19 +232,19 @@ def query_mode(args, query_obj, query_btn):
                 cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
                 cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
                 if (object_name == query_obj):
-                    if (counter >= 3):
-                        if ((xmin + xmax)/2 > 2*imW/3):
-                            subprocess.run(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is at your right.'"])
-                            # play_voice(f"Found the {query_obj}! It is at your right.")
-                        elif ((xmin + xmax)/2 < imW/3):
-                            subprocess.run(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is at your left.'"])
-                            # play_voice(f"Found the {query_obj}! It is at your left.")
-                        else:
-                            subprocess.run(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is in front of you.'"])
-                            # play_voice(f"Found the {query_obj}! It is in front of you.")
-                        breakFlag = True
-                        break
-                    counter += 1
+                    # if (counter >= 3):
+                    if ((xmin + xmax)/2 > 2*imW/3):
+                        subprocess.run(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is at your right.'"])
+                        # play_voice(f"Found the {query_obj}! It is at your right.")
+                    elif ((xmin + xmax)/2 < imW/3):
+                        subprocess.run(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is at your left.'"])
+                        # play_voice(f"Found the {query_obj}! It is at your left.")
+                    else:
+                        subprocess.run(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is in front of you.'"])
+                        # play_voice(f"Found the {query_obj}! It is in front of you.")
+                    breakFlag = True
+                    break
+                    # counter += 1
                 else:
                     counter = 0
         
