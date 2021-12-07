@@ -14,7 +14,7 @@
 # I added my own method of drawing boxes and labels using OpenCV.
 
 # Import packages
-import os
+import os, subprocess
 import argparse
 import cv2
 import numpy as np
@@ -24,7 +24,7 @@ from threading import Thread
 import importlib.util
 
 # Audio Setup
-from play_voice import play_voice
+# from play_voice import play_voice
 
 # GPIO - Pi Buttons
 from gpiozero import Button
@@ -83,7 +83,8 @@ def safari_mode(args, query_button):
     # Initialize video stream
     videostream = VideoStream(resolution=(imW,imH),framerate=30).start()
     time.sleep(1)
-    play_voice("Safari mode is activated")
+    # play_voice("Safari mode is activated")
+    subprocess.run(["python3", "play_voice.py", "--text='Safari mode is activated'"])
     #for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
     out = 0
     while True:
@@ -128,11 +129,14 @@ def safari_mode(args, query_button):
                 object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
                 if (scores[i] > 0.8):
                     if ((xmin + xmax)/2 > 2*imW/3):
-                        play_voice(f"{object_name} at your right")
+                        # play_voice(f"{object_name} at your right")
+                        subprocess.run(["python3", "play_voice.py", f"--text='{object_name} at your right'"])
                     elif ((xmin + xmax)/2 < imW/3):
-                        play_voice(f"{object_name} at your left")
+                        # play_voice(f"{object_name} at your left")
+                        subprocess.run(["python3", "play_voice.py", f"--text='{object_name} at your left'"])
                     else:
-                        play_voice(f"{object_name} in front of you")
+                        # play_voice(f"{object_name} in front of you")
+                        subprocess.run(["python3", "play_voice.py", f"--text='{object_name} in front of you'"])
 
                 # Draw label
                 
@@ -230,11 +234,14 @@ def query_mode(args, query_obj, query_btn):
                 if (object_name == query_obj):
                     if (counter >= 3):
                         if ((xmin + xmax)/2 > 2*imW/3):
-                            play_voice(f"Found the {query_obj}! It is at your right.")
+                            subprocess.run(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is at your right.'"])
+                            # play_voice(f"Found the {query_obj}! It is at your right.")
                         elif ((xmin + xmax)/2 < imW/3):
-                            play_voice(f"Found the {query_obj}! It is at your left.")
+                            subprocess.run(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is at your left.'"])
+                            # play_voice(f"Found the {query_obj}! It is at your left.")
                         else:
-                            play_voice(f"Found the {query_obj}! It is in front of you.")
+                            subprocess.run(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is in front of you.'"])
+                            # play_voice(f"Found the {query_obj}! It is in front of you.")
                         breakFlag = True
                         break
                     counter += 1
@@ -254,7 +261,8 @@ def query_mode(args, query_obj, query_btn):
 
         # Press 'q' to quit
         if cv2.waitKey(1) == ord('q') or breakFlag or query_btn.is_held:
-            play_voice("Returning to Safari Mode")
+            subprocess.run(["python3", "play_voice.py", "--text='Returning to Safari Mode'"])
+            # play_voice("Returning to Safari Mode")
             break
 
     # Clean up

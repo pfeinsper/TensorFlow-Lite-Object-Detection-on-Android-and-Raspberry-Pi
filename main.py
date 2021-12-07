@@ -1,11 +1,11 @@
 from logging import captureWarnings
-import os, time, argparse
+import os, time, argparse, subprocess
 
 # GPIO - Pi Buttons
 from gpiozero import Button
 
 # Audio
-from play_voice import play_voice
+# from play_voice import play_voice
 from audio_recognition.recording import record_to_file
 from audio_recognition.voice_recognition import VoiceRecognition
 
@@ -76,13 +76,16 @@ class VMobi:
                 qmode.list_elements(self.categories)
                 categ = None
             elif categ == 'text':
-                play_voice("You chose text category. Start recognizing")
+                subprocess.run(["python3", "play_voice.py", "--text='You chose text category. Start recognizing'"])
+                # play_voice("You chose text category. Start recognizing")
                 return 'text'
             else:
-                play_voice("Category not in dataset. Which category do you want?")
+                subprocess.run(["python3", "play_voice.py", "--text='Category not in dataset. Which category do you want?'"])
+                # play_voice("Category not in dataset. Which category do you want?")
                 record_to_file("audio_recognition/output.wav")
                 
-        play_voice(f"You chose the category: {categ}", self.lang)
+        # play_voice(f"You chose the category: {categ}", self.lang)
+        subprocess.run(["python3", "play_voice.py", f"--text='You chose the category: {categ}'"])
         return categ
     
 
@@ -120,6 +123,5 @@ if __name__ == '__main__':
     parser.add_argument('--safari', help='Start Safari Mode', action='store_true')
     parser.add_argument('--query', help='Start Query Mode', default='?')
 
-    args = parser.parse_args()
 
     helper = VMobi(args)

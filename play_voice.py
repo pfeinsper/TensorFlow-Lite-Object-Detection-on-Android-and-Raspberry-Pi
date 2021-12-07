@@ -1,4 +1,4 @@
-import os
+import os, argparse
 
 # Library text to audio
 from gtts import gTTS
@@ -15,3 +15,10 @@ def play_voice(mText, lang="en"):
     tts_audio.save("audio_recognition/voice.wav")
     play(AudioSegment.from_file("audio_recognition/voice.wav"))
     os.remove("audio_recognition/voice.wav")
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--text', help='Text to play in the audio')
+    parser.add_argument('--lang', help='Language to be spoken', default="en")
+    args = parser.parse_args()
+    play_voice(args.text, args.lang)
