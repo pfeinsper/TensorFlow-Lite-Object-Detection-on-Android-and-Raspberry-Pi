@@ -76,16 +76,16 @@ class VMobi:
                 qmode.list_elements(self.categories)
                 categ = None
             elif categ == 'text':
-                subprocess.run(["python3", "play_voice.py", "--text='You chose text category. Start recognizing'"])
+                subprocess.Popen(["python3", "play_voice.py", "--text='You chose text category. Start recognizing'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                 # play_voice("You chose text category. Start recognizing")
                 return 'text'
             else:
-                subprocess.run(["python3", "play_voice.py", "--text='Category not in dataset. Which category do you want?'"])
+                subprocess.Popen(["python3", "play_voice.py", "--text='Category not in dataset. Which category do you want?'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                 # play_voice("Category not in dataset. Which category do you want?")
                 record_to_file("audio_recognition/output.wav")
                 
         # play_voice(f"You chose the category: {categ}", self.lang)
-        subprocess.run(["python3", "play_voice.py", f"--text='You chose the category: {categ}'"])
+        subprocess.Popen(["python3", "play_voice.py", f"--text='You chose the category: {categ}'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
         return categ
     
 
@@ -124,4 +124,5 @@ if __name__ == '__main__':
     parser.add_argument('--query', help='Start Query Mode', default='?')
 
     args = parser.parse_args()
+
     helper = VMobi(args)
