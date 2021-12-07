@@ -24,7 +24,7 @@ from threading import Thread
 import importlib.util
 
 # Audio Setup
-# from play_voice import play_voice
+from play_voice import play_voice
 
 # GPIO - Pi Buttons
 from gpiozero import Button
@@ -84,7 +84,11 @@ def safari_mode(args, query_button):
     videostream = VideoStream(resolution=(imW,imH),framerate=30).start()
     time.sleep(1)
     # play_voice("Safari mode is activated")
-    subprocess.Popen(["python3", "play_voice.py", "--text='Safari mode is activated'"], shell=True, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
+    pid = os.fork()
+    if (pid == 0):
+        play_voice("Safari mode is activated")
+        exit(0)
+    # subprocess.Popen(["python3", "play_voice.py", "--text='Safari mode is activated'"], shell=True, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True)
     #for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
     out = 0
     while True:
@@ -129,14 +133,26 @@ def safari_mode(args, query_button):
                 object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
                 if (scores[i] > 0.8):
                     if ((xmin + xmax)/2 > 2*imW/3):
+                        pid = os.fork()
+                        if (pid == 0):
+                            play_voice(f"{object_name} at your right")
+                            exit(0)
                         # play_voice(f"{object_name} at your right")
-                        subprocess.Popen(["python3", "play_voice.py", f"--text='{object_name} at your right'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                        # subprocess.Popen(["python3", "play_voice.py", f"--text='{object_name} at your right'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                     elif ((xmin + xmax)/2 < imW/3):
+                        pid = os.fork()
+                        if (pid == 0):
+                            play_voice(f"{object_name} at your left")
+                            exit(0)
                         # play_voice(f"{object_name} at your left")
-                        subprocess.Popen(["python3", "play_voice.py", f"--text='{object_name} at your left'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                        # subprocess.Popen(["python3", "play_voice.py", f"--text='{object_name} at your left'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                     else:
+                        pid = os.fork()
+                        if (pid == 0):
+                            play_voice(f"{object_name} in front of you")
+                            exit(0)
                         # play_voice(f"{object_name} in front of you")
-                        subprocess.Popen(["python3", "play_voice.py", f"--text='{object_name} in front of you'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                        # subprocess.Popen(["python3", "play_voice.py", f"--text='{object_name} in front of you'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
 
                 # Draw label
                 
@@ -234,13 +250,25 @@ def query_mode(args, query_obj, query_btn):
                 if (object_name == query_obj):
                     # if (counter >= 3):
                     if ((xmin + xmax)/2 > 2*imW/3):
-                        subprocess.Popen(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is at your right.'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                        pid = os.fork()
+                        if (pid == 0):
+                            play_voice(f"Found the {query_obj}! It is at your right.")
+                            exit(0)
+                        # subprocess.Popen(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is at your right.'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                         # play_voice(f"Found the {query_obj}! It is at your right.")
                     elif ((xmin + xmax)/2 < imW/3):
-                        subprocess.Popen(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is at your left.'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                        pid = os.fork()
+                        if (pid == 0):
+                            play_voice(f"Found the {query_obj}! It is at your left.")
+                            exit(0)
+                        # subprocess.Popen(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is at your left.'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                         # play_voice(f"Found the {query_obj}! It is at your left.")
                     else:
-                        subprocess.Popen(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is in front of you.'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                        pid = os.fork()
+                        if (pid == 0):
+                            play_voice(f"Found the {query_obj}! It is in front of you.")
+                            exit(0)
+                        # subprocess.Popen(["python3", "play_voice.py", f"--text='Found the {query_obj}! It is in front of you.'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                         # play_voice(f"Found the {query_obj}! It is in front of you.")
                     breakFlag = True
                     break
@@ -261,7 +289,11 @@ def query_mode(args, query_obj, query_btn):
 
         # Press 'q' to quit
         if cv2.waitKey(1) == ord('q') or breakFlag or query_btn.is_held:
-            subprocess.Popen(["python3", "play_voice.py", "--text='Returning to Safari Mode'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+            pid = os.fork()
+            if (pid == 0):
+                play_voice(f"Returning to Safari Mode")
+                exit(0)
+            # subprocess.Popen(["python3", "play_voice.py", "--text='Returning to Safari Mode'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
             # play_voice("Returning to Safari Mode")
             break
 

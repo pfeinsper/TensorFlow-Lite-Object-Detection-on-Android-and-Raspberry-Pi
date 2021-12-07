@@ -5,7 +5,7 @@ import os, time, argparse, subprocess
 from gpiozero import Button
 
 # Audio
-# from play_voice import play_voice
+from play_voice import play_voice
 from audio_recognition.recording import record_to_file
 from audio_recognition.voice_recognition import VoiceRecognition
 
@@ -76,16 +76,28 @@ class VMobi:
                 qmode.list_elements(self.categories)
                 categ = None
             elif categ == 'text':
-                subprocess.Popen(["python3", "play_voice.py", "--text='You chose text category. Start recognizing'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                pid = os.fork()
+                if (pid == 0):
+                    play_voice("You chose text category. Start recognizing")
+                    exit(0)
+                # subprocess.run(["python3", "play_voice.py", "--text='You chose text category. Start recognizing'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                 # play_voice("You chose text category. Start recognizing")
                 return 'text'
             else:
-                subprocess.Popen(["python3", "play_voice.py", "--text='Category not in dataset. Which category do you want?'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+                pid = os.fork()
+                if (pid == 0):
+                    play_voice("Category not in dataset. Which category do you want?")
+                    exit(0)
+                # subprocess.run(["python3", "play_voice.py", "--text='Category not in dataset. Which category do you want?'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
                 # play_voice("Category not in dataset. Which category do you want?")
                 record_to_file("audio_recognition/output.wav")
                 
         # play_voice(f"You chose the category: {categ}", self.lang)
-        subprocess.Popen(["python3", "play_voice.py", f"--text='You chose the category: {categ}'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
+        pid = os.fork()
+        if (pid == 0):
+            play_voice(f"You chose the category: {categ}")
+            exit(0)
+        # subprocess.run(["python3", "play_voice.py", f"--text='You chose the category: {categ}'"], shell=True, stdin=None, stdout=None, stderr=None, close_fds=True)
         return categ
     
 
