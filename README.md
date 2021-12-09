@@ -45,13 +45,13 @@ Hardware
 - Google Coral TPU (USB)
 - GPIO Hardware:
   - Protoboard
-  - 3 Simple Buttons
-  - At least 7 jumpers
+  - 1 Simple Button
+  - At least 2 jumpers
 
 The main _hardware_ is the Raspberry Pi 4 Model B, all other pieces are connected to it.
 
 > Diagram of the Hardware Connections
-![Diagram of the Hardware Connections](images/VMobi-diagram-connections-hw.drawio.png)
+![Diagram of the Hardware Connections](images/VMobi_hardware_connections.png)
 
 Installing the raspbian OS
 ===========================
