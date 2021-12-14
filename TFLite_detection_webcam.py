@@ -131,11 +131,11 @@ def safari_mode(args, query_button):
 
                 if (scores[i] > 0.9):
                     if ((xmin + xmax)/2 > imW/2):
-                        play_voice_threaded(f"{object_name} at your right")
+                        play_voice(f"{object_name} at your right")
                     elif ((xmin + xmax)/2 < imW/2):
-                        play_voice_threaded(f"{object_name} at your left")
+                        play_voice(f"{object_name} at your left")
                     else:
-                        play_voice_threaded(f"{object_name} in your way")
+                        play_voice(f"{object_name} in your way")
 
                 # Draw label
                 object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
@@ -233,7 +233,7 @@ def query_mode(args, query_obj):
                 cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
                 if (object_name == query_obj):
                     if (counter >= 5):
-                        play_voice_threaded(f"Found the {query_obj}")
+                        play_voice(f"Found the {query_obj}")
                         breakFlag = True
                         break
                     counter += 1
@@ -348,9 +348,6 @@ def play_voice(mText, lang="en"):
     tts_audio.save("voice.wav")
     play(AudioSegment.from_file("voice.wav"))
     os.remove("voice.wav")
-
-def play_voice_threaded(txt, lang='en'):
-    Thread(target=play_voice, args=[txt, lang]).start()
         
 if __name__ == '__main__':
     # Define and parse input arguments
