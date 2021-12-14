@@ -1,5 +1,4 @@
 import os
-from threading import Thread
 
 # Library text to audio
 from gtts import gTTS
@@ -8,7 +7,7 @@ from gtts import gTTS
 from pydub import AudioSegment
 from pydub.playback import play
 
-def play(mText, lang="en"):
+def play_voice(mText, lang="en"):
     """Function used to play the string 'mText' in audio using tts"""
     print(f"[play_voice] now playing: '{mText}'")
     tts_audio = gTTS(text=mText, lang=lang, slow=False)
@@ -16,6 +15,3 @@ def play(mText, lang="en"):
     tts_audio.save("audio_recognition/voice.wav")
     play(AudioSegment.from_file("audio_recognition/voice.wav"))
     os.remove("audio_recognition/voice.wav")
-
-def play_voice(mText, lang='en'):
-    Thread(target=play, args=(mText, lang)).start()
