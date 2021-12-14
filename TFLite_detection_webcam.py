@@ -72,7 +72,7 @@ class VideoStream:
         print("Stopping videostream")
         self.stopped = True
 
-def safari_mode(args, query_button):
+def safari_mode(args, query_button, lang="en", ptbr_categ=None):
     """Runs the Safari Mode; args is a tuple"""
     interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels = args
 
@@ -128,11 +128,20 @@ def safari_mode(args, query_button):
                 object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
                 if (scores[i] > 0.8):
                     if ((xmin + xmax)/2 > 2*imW/3):
-                        play_voice(f"{object_name} at your right")
+                        if (lang == "pt"):
+                            play_voice(f"{ptbr_categ[object_name]} à sua direita")
+                        else:
+                            play_voice(f"{object_name} at your right")
                     elif ((xmin + xmax)/2 < imW/3):
-                        play_voice(f"{object_name} at your left")
+                        if (lang == "pt"):
+                            play_voice(f"{ptbr_categ[object_name]} à sua esquerda")
+                        else:
+                            play_voice(f"{object_name} at your left")
                     else:
-                        play_voice(f"{object_name} in front of you")
+                        if (lang == "pt"):
+                            play_voice(f"{ptbr_categ[object_name]} à sua frente")
+                        else:
+                            play_voice(f"{object_name} in front of you")
 
                 # Draw label
                 
@@ -167,7 +176,7 @@ def safari_mode(args, query_button):
     # if t.do_run:
     #     t.do_run = False
 
-def query_mode(args, query_obj, query_btn):
+def query_mode(args, query_obj, query_btn, lang="en", ptbr_categ=None):
     """Runs the query mode"""
     interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels = args
 
@@ -230,11 +239,20 @@ def query_mode(args, query_obj, query_btn):
                 if (object_name == query_obj):
                     if (counter >= 3):
                         if ((xmin + xmax)/2 > 2*imW/3):
-                            play_voice(f"Found the {query_obj}! It is at your right.")
+                            if (lang == "pt"):
+                                play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua direita.", lang[:2])
+                            else:
+                                play_voice(f"Found the {query_obj}! It is at your right.")
                         elif ((xmin + xmax)/2 < imW/3):
-                            play_voice(f"Found the {query_obj}! It is at your left.")
+                            if (lang == "pt"):
+                                play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua esquerda.", lang[:2])
+                            else:
+                                play_voice(f"Found the {query_obj}! It is at your left.")
                         else:
-                            play_voice(f"Found the {query_obj}! It is in front of you.")
+                            if (lang == "pt"):
+                                play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua frente.", lang[:2])
+                            else:
+                                play_voice(f"Found the {query_obj}! It is in front of you.")
                         breakFlag = True
                         break
                     counter += 1
@@ -254,7 +272,10 @@ def query_mode(args, query_obj, query_btn):
 
         # Press 'q' to quit
         if cv2.waitKey(1) == ord('q') or breakFlag or query_btn.is_held:
-            play_voice("Returning to Safari Mode")
+            if (lang=="pt"):
+                play_voice("Retornando ao Modo Safari")
+            else:
+                play_voice("Returning to Safari Mode")
             break
 
     # Clean up

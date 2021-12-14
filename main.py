@@ -1,5 +1,5 @@
 from logging import captureWarnings
-import os, time, argparse
+import os, time, argparse, json
 
 # GPIO - Pi Buttons
 from gpiozero import Button
@@ -18,13 +18,15 @@ from text_recognition.opencv_text_detection.text_detection import main_text_dete
 class VMobi:
     """Class that represents the system as a whole"""
 
-    def __init__(self, args, lang = "en"):
+    def __init__(self, args, ptbr_categ):
         self.args = args # Saving arguments
         self.MODEL_DIR = args.modeldir # Directory of the .tflite file and names file
         self.RESOLUTION = args.resolution # Camera resolution in pixels
         self.USE_EDGETPU = args.edgetpu # Flag to use the google coral tpu
-        self.lang = lang # Language used on tts speech voice
+        self.lang = args.lang # Language used on tts speech voice
+        self.tts_lang = args.lang[:2]
         self.east_model_path = os.getcwd() + "/text_recognition/east_model_float16.tflite" # EAST .tflite path for text recognition
+        self.ptbr_categ = ptbr_categ
         self.main() # Runs on the raspberry with buttons on the GPIO
 
 
@@ -61,7 +63,7 @@ class VMobi:
     def query_mode_voice_type(self):
         """Query  mode that uses voice recognition and only the query button"""
         print("Entering query mode with voice recognition. (Type 2)")
-        qmode = VoiceRecognition()
+        qmode = VoiceRecognition(language=self.lang)
         qmode.greetings()
         record_to_file("audio_recognition/output.wav")
         categ = qmode.speech_recog()
@@ -73,16 +75,25 @@ class VMobi:
                 record_to_file("audio_recognition/output.wav")
                 categ = qmode.speech_recog()
             elif categ == "list" or categ == "least":
-                qmode.list_elements(self.categories)
+                qmode.list_elements(self.categories, self.ptbr_categ)
                 categ = None
             elif categ == 'text':
-                play_voice("You chose text category. Start recognizing")
+                if (self.tts_lang == "pt"):
+                    play_voice("Você escolheu a categoria de texto. Iniciando o reconhecimento.")
+                else:
+                    play_voice("You chose text category. Start recognizing")
                 return 'text'
             else:
-                play_voice("Category not in dataset. Which category do you want?")
+                if (self.tts_lang == "pt"):
+                    play_voice("Categoria não está no dataset. Qual categoria você gostaria de procurar?")
+                else:
+                    play_voice("Category not in dataset. Which category do you want?")
                 record_to_file("audio_recognition/output.wav")
                 
-        play_voice(f"You chose the category: {categ}", self.lang)
+        if (self.tts_lang == "pt"):
+            play_voice(f"Você escolheu a categoria: {self.ptbr_categ[categ]}", self.tts_lang)
+        else:
+            play_voice(f"You chose the category: {categ}", self.lang)
         return categ
     
 
@@ -119,7 +130,11 @@ if __name__ == '__main__':
                         action='store_true')
     parser.add_argument('--safari', help='Start Safari Mode', action='store_true')
     parser.add_argument('--query', help='Start Query Mode', default='?')
+    parser.add_argument('--lang', help='Choose the speech language (e.g. "en", "pt-br", ...)', default='en')
 
     args = parser.parse_args()
 
-    helper = VMobi(args)
+    with open('locales/ptbr.json') as json_file:
+        ptbr_categ = json.load(json_file)
+
+    helper = VMobi(args, ptbr_categ)
