@@ -83,7 +83,10 @@ def safari_mode(args, query_button, lang="en", ptbr_categ=None):
     # Initialize video stream
     videostream = VideoStream(resolution=(imW,imH),framerate=30).start()
     time.sleep(1)
-    play_voice("Safari mode is activated")
+    if (lang=="pt"):
+        play_voice("Modo safari foi ativado")
+    else:
+        play_voice("Safari mode is activated")
     #for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
     out = 0
     while True:
