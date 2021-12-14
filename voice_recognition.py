@@ -9,8 +9,9 @@ from  recording import record_to_file
 moc = {"food": ["apple", "banana", "hamburguer", "strawberry"], "automobiles":["car", "motorcycle", "bicycle"]}
 
 class VoiceRecognition():
-    def __init__(self, language="en"):
+    def __init__(self, language="en", tts_lang="en"):
         self.language = language
+        self.tts_lang = tts_lang
 
     def speech_recog(self):
         mic = sr.Recognizer()
@@ -41,7 +42,7 @@ class VoiceRecognition():
 
 
     def play_voice(self, mText):
-        tts_audio = gTTS(text=mText, lang=self.language, slow=False)
+        tts_audio = gTTS(text=mText, lang=self.tts_lang, slow=False)
         tts_audio.save("voice.wav")
         play(AudioSegment.from_file("voice.wav"))
         os.remove("voice.wav")

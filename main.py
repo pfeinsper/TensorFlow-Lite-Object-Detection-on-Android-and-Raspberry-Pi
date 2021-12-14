@@ -18,13 +18,13 @@ from TFLite_detection_webcam import initialize_detector, safari_mode, query_mode
 class VMobi:
     """Class that represents the system as a whole"""
 
-    def __init__(self, args, lang = "en"):
+    def __init__(self, args):
         self.args = args # Saving arguments on a variable
         self.MODEL_DIR = args.modeldir # Directory of the .tflite file and names file
         self.RESOLUTION = args.resolution # Camera resolution as in pixels 
         self.USE_EDGETPU = args.edgetpu # Flag to use the google coral tpu
-        self.lang = lang # Language used on tts speech voice
-
+        self.lang = args.lang # Language used on tts speech voice
+        self.tts_lang = args.lang[0:2]
         self.main() # Runs on the raspberry with buttons on the GPIO
         # self.test() # Function to test tts on PC
 
@@ -33,9 +33,16 @@ class VMobi:
         print(categories)
         time.sleep(1)
         print("Now playing the audio")
-        play_voice("Query mode activaded. Which category do you want?", self.lang)
+        if (self.tts_lang == "pt"):
+            play_voice("Modo query ativado. Qual categoria você deseja buscar?", self.lang)
+        else:
+            play_voice("Query mode activaded. Which category do you want?", self.lang)
         for cat in categories:
+            if (self.lang == "pt"):
+                play_voice(cat, self.lang)
+                continue
             play_voice(cat, self.lang)
+            
 
     def main(self):
         """Main function that orchestrates the product"""
@@ -183,6 +190,8 @@ if __name__ == '__main__':
                         action='store_true')
     parser.add_argument('--safari', help='Start Safari Mode', action='store_true')
     parser.add_argument('--query', help='Start Query Mode', default='?')
+    
+    parser.add_argument('--lang', help='Language to be spoken (e.g. "en" or "pt-br")', default='en')
 
     args = parser.parse_args()
 
