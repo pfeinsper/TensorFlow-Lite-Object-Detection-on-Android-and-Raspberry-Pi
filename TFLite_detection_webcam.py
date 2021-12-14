@@ -83,8 +83,8 @@ def safari_mode(args, query_button, lang="en", ptbr_categ=None):
     # Initialize video stream
     videostream = VideoStream(resolution=(imW,imH),framerate=30).start()
     time.sleep(1)
-    if (lang=="pt"):
-        play_voice("Modo safari foi ativado")
+    if (lang=="pt-br"):
+        play_voice("Modo safari foi ativado", lang=lang[:2])
     else:
         play_voice("Safari mode is activated")
     #for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
@@ -131,18 +131,18 @@ def safari_mode(args, query_button, lang="en", ptbr_categ=None):
                 object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
                 if (scores[i] > 0.8):
                     if ((xmin + xmax)/2 > 2*imW/3):
-                        if (lang == "pt"):
-                            play_voice(f"{ptbr_categ[object_name]} à sua direita")
+                        if (lang == "pt-br"):
+                            play_voice(f"{ptbr_categ[object_name]} à sua direita", lang[:2])
                         else:
                             play_voice(f"{object_name} at your right")
                     elif ((xmin + xmax)/2 < imW/3):
-                        if (lang == "pt"):
-                            play_voice(f"{ptbr_categ[object_name]} à sua esquerda")
+                        if (lang == "pt-br"):
+                            play_voice(f"{ptbr_categ[object_name]} à sua esquerda", lang[:2])
                         else:
                             play_voice(f"{object_name} at your left")
                     else:
-                        if (lang == "pt"):
-                            play_voice(f"{ptbr_categ[object_name]} à sua frente")
+                        if (lang == "pt-br"):
+                            play_voice(f"{ptbr_categ[object_name]} à sua frente", lang[:2])
                         else:
                             play_voice(f"{object_name} in front of you")
 
@@ -242,17 +242,17 @@ def query_mode(args, query_obj, query_btn, lang="en", ptbr_categ=None):
                 if (object_name == query_obj):
                     if (counter >= 3):
                         if ((xmin + xmax)/2 > 2*imW/3):
-                            if (lang == "pt"):
+                            if (lang == "pt-br"):
                                 play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua direita.", lang[:2])
                             else:
                                 play_voice(f"Found the {query_obj}! It is at your right.")
                         elif ((xmin + xmax)/2 < imW/3):
-                            if (lang == "pt"):
+                            if (lang == "pt-br"):
                                 play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua esquerda.", lang[:2])
                             else:
                                 play_voice(f"Found the {query_obj}! It is at your left.")
                         else:
-                            if (lang == "pt"):
+                            if (lang == "pt-br"):
                                 play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua frente.", lang[:2])
                             else:
                                 play_voice(f"Found the {query_obj}! It is in front of you.")
