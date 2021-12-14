@@ -48,7 +48,7 @@ class VMobi:
         detector_args = initialize_detector(self.args)
             
         while (True):
-            s = safari_mode(detector_args, self.query_button)
+            s = safari_mode(detector_args, self.query_button, lang=self.lang, ptbr_categ=self.ptbr_categ)
             if s > 0:
                 # Enter Query Mode
                 query_cat = self.query_mode_voice_type() # Get the category with voice command
@@ -56,7 +56,7 @@ class VMobi:
                     main_text_detection(self.east_model_path, self.query_button)
                     continue
                 else:
-                    query_mode(detector_args, query_cat, query_btn=self.query_button)
+                    query_mode(detector_args, query_cat, query_btn=self.query_button, lang=self.lang, ptbr_categ=self.ptbr_categ)
                     continue
             
 
