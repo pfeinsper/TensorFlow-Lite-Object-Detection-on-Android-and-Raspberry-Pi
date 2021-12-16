@@ -143,13 +143,12 @@ def play_voice(mText, lang="en"):
     tts_audio.save("audio_recognition/voice.wav")
     play(AudioSegment.from_file("audio_recognition/voice.wav"))
     os.remove("audio_recognition/voice.wav")
-    
+
 def multithreading_queue_checker(lang):
     global fila
     while (True):
         if not fila.empty():
             play_voice(fila.get(), lang)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

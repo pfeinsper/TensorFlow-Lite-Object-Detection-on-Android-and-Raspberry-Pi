@@ -72,7 +72,7 @@ class VideoStream:
 def safari_mode(args, query_button, fila, lang="en", ptbr_categ=None):
     """Runs the Safari Mode; args is a tuple"""
     interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels = args
-
+    timeout_categs = {"???": 0, "person": 0, "bicycle": 0, "car": 0, "motorcycle": 0, "airplane": 0, "bus": 0, "train": 0, "truck": 0, "boat": 0, "traffic light": 0, "fire hydrant": 0, "stop sign": 0, "parking meter": 0, "bench": 0, "bird": 0, "cat": 0, "dog": 0, "horse": 0, "sheep": 0, "cow": 0, "elephant": 0, "bear": 0, "zebra": 0, "giraffe": 0, "backpack": 0, "umbrella": 0, "handbag:": 0, "tie": 0, "suitcase": 0, "frisbee": 0, "skis": 0, "snowboard": 0, "sports ball": 0, "kite": 0, "baseball bat": 0, "baseball glove": 0, "skateboard": 0, "surfboard": 0, "tennis racket": 0, "bottle": 0, "wine glass": 0, "cup": 0, "fork": 0, "knife": 0, "spoon": 0, "bowl": 0, "banana": 0, "apple": 0, "sandwich": 0, "orange": 0, "broccoli": 0, "carrot": 0, "hot dog": 0, "pizza": 0, "donut": 0, "cake": 0, "chair": 0, "couch": 0, "potted plant": 0, "bed": 0, "dining table": 0, "toilet": 0, "tv:": 0, "laptop": 0, "mouse": 0, "remote": 0, "keyboard": 0, "cell phone": 0, "microwave": 0, "oven": 0, "toaster": 0, "sink": 0, "refrigerator": 0, "book": 0, "clock": 0, "vase": 0, "scissors": 0, "teddy bear": 0, "hair drier": 0, "toothbrush": 0}
     # Initialize frame rate calculation
     frame_rate_calc = 1
     freq = cv2.getTickFrequency()
@@ -129,27 +129,29 @@ def safari_mode(args, query_button, fila, lang="en", ptbr_categ=None):
                 
                 object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
                 if (scores[i] > 0.8):
-                    if ((xmin + xmax)/2 > 2*imW/3):
-                        if (lang == "pt-br"):
-                            # play_voice(f"{ptbr_categ[object_name]} à sua direita", lang[:2])
-                            fila.put(f"{ptbr_categ[object_name]} à sua direita")
+                    if (time.time() - timeout_categs[object_name] >= 2):
+                        if ((xmin + xmax)/2 > 2*imW/3):
+                            if (lang == "pt-br"):
+                                # play_voice(f"{ptbr_categ[object_name]} à sua direita", lang[:2])
+                                fila.put(f"{ptbr_categ[object_name]} à sua direita")
+                            else:
+                                # play_voice(f"{object_name} at your right")
+                                fila.put(f"{object_name} at your right")
+                        elif ((xmin + xmax)/2 < imW/3):
+                            if (lang == "pt-br"):
+                                # play_voice(f"{ptbr_categ[object_name]} à sua esquerda", lang[:2])
+                                fila.put(f"{ptbr_categ[object_name]} à sua esquerda")
+                            else:
+                                # play_voice(f"{object_name} at your left")
+                                fila.put(f"{object_name} at your left")
                         else:
-                            # play_voice(f"{object_name} at your right")
-                            fila.put(f"{object_name} at your right")
-                    elif ((xmin + xmax)/2 < imW/3):
-                        if (lang == "pt-br"):
-                            # play_voice(f"{ptbr_categ[object_name]} à sua esquerda", lang[:2])
-                            fila.put(f"{ptbr_categ[object_name]} à sua esquerda")
-                        else:
-                            # play_voice(f"{object_name} at your left")
-                            fila.put(f"{object_name} at your left")
-                    else:
-                        if (lang == "pt-br"):
-                            # play_voice(f"{ptbr_categ[object_name]} à sua frente", lang[:2])
-                            fila.put(f"{ptbr_categ[object_name]} à sua frente")
-                        else:
-                            # play_voice(f"{object_name} in front of you")
-                            fila.put(f"{object_name} in front of you")
+                            if (lang == "pt-br"):
+                                # play_voice(f"{ptbr_categ[object_name]} à sua frente", lang[:2])
+                                fila.put(f"{ptbr_categ[object_name]} à sua frente")
+                            else:
+                                # play_voice(f"{object_name} in front of you")
+                                fila.put(f"{object_name} in front of you")
+                        timeout_categs[object_name] = time.time()
 
                 # Draw label
                 
@@ -187,7 +189,6 @@ def safari_mode(args, query_button, fila, lang="en", ptbr_categ=None):
 def query_mode(args, query_obj, query_btn, fila, lang="en", ptbr_categ=None):
     """Runs the query mode"""
     interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels = args
-
     # Initialize frame rate calculation
     frame_rate_calc = 1
     freq = cv2.getTickFrequency()
@@ -197,7 +198,7 @@ def query_mode(args, query_obj, query_btn, fila, lang="en", ptbr_categ=None):
     time.sleep(1)
 
     #for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
-    counter = 0
+    # counter = 0
     breakFlag = False
     while True:
         # Start timer (for calculating frame rate)
@@ -245,33 +246,34 @@ def query_mode(args, query_obj, query_btn, fila, lang="en", ptbr_categ=None):
                 cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
                 cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
                 if (object_name == query_obj):
-                    if (counter >= 3):
-                        if ((xmin + xmax)/2 > 2*imW/3):
-                            if (lang == "pt-br"):
-                                # play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua direita.", lang[:2])
-                                fila.put(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua direita.")
-                            else:
-                                # play_voice(f"Found the {query_obj}! It is at your right.")
-                                fila.put(f"Found the {query_obj}! It is at your right.")
-                        elif ((xmin + xmax)/2 < imW/3):
-                            if (lang == "pt-br"):
-                                # play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua esquerda.", lang[:2])
-                                fila.put(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua esquerda.")
-                            else:
-                                # play_voice(f"Found the {query_obj}! It is at your left.")
-                                fila.put(f"Found the {query_obj}! It is at your left.")
+                    # if (counter >= 3):
+                    if ((xmin + xmax)/2 > 2*imW/3):
+                        if (lang == "pt-br"):
+                            # play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua direita.", lang[:2])
+                            fila.put(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua direita.")
                         else:
-                            if (lang == "pt-br"):
-                                # play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua frente.", lang[:2])
-                                fila.put(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua frente.")
-                            else:
-                                # play_voice(f"Found the {query_obj}! It is in front of you.")
-                                fila.put(f"Found the {query_obj}! It is in front of you.")
-                        breakFlag = True
-                        break
-                    counter += 1
-                else:
-                    counter = 0
+                            # play_voice(f"Found the {query_obj}! It is at your right.")
+                            fila.put(f"Found the {query_obj}! It is at your right.")
+                    elif ((xmin + xmax)/2 < imW/3):
+                        if (lang == "pt-br"):
+                            # play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua esquerda.", lang[:2])
+                            fila.put(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua esquerda.")
+                        else:
+                            # play_voice(f"Found the {query_obj}! It is at your left.")
+                            fila.put(f"Found the {query_obj}! It is at your left.")
+                    else:
+                        if (lang == "pt-br"):
+                            # play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua frente.", lang[:2])
+                            fila.put(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua frente.")
+                        else:
+                            # play_voice(f"Found the {query_obj}! It is in front of you.")
+                            fila.put(f"Found the {query_obj}! It is in front of you.")
+                    breakFlag = True
+                    break
+
+                    # counter += 1
+                # else:
+                #     counter = 0
         
         # Draw framerate in corner of frame
         cv2.putText(frame,'FPS: {0:.2f}'.format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
