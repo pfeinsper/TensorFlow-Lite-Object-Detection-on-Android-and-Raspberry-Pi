@@ -129,7 +129,7 @@ def safari_mode(args, query_button, fila, lang="en", ptbr_categ=None):
                 
                 object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
                 if (scores[i] > 0.8):
-                    if (time.time() - timeout_categs[object_name] >= 2):
+                    if (time.time() - timeout_categs[object_name] >= 3):
                         if ((xmin + xmax)/2 > 2*imW/3):
                             if (lang == "pt-br"):
                                 # play_voice(f"{ptbr_categ[object_name]} à sua direita", lang[:2])
