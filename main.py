@@ -154,6 +154,6 @@ if __name__ == '__main__':
 
     global fila
     fila = queue.Queue()
-    Thread(target=thread_check, args=(args.lang[:2])).start()
+    Thread(target=thread_check, args=(args.lang[:2],)).start()
 
     helper = VMobi(args, ptbr_categ)
