@@ -86,12 +86,9 @@ class VMobi:
         qmode = VoiceRecognition(language=self.lang)
         qmode.greetings(fila)
 
-        while eve.is_set():
-            eve.wait(1)
 
-        if (not eve.is_set()):
-            record_to_file("audio_recognition/output.wav")
-            categ = qmode.speech_recog()
+        record_to_file("audio_recognition/output.wav")
+        categ = qmode.speech_recog()
         
         
         while categ == None or categ == "list" or categ == "least" or (categ not in self.categories) or (categ not in self.pt_to_en_categs.keys()):
@@ -124,11 +121,11 @@ class VMobi:
             categ = qmode.speech_recog()
                 
         if (self.tts_lang == "pt"):
-            # play_voice(f"Você escolheu a categoria: {self.ptbr_categ[categ]}", self.tts_lang)
-            fila.put(f"Você escolheu a categoria: {self.ptbr_categ[categ]}")
+            play_voice(f"Você escolheu a categoria: {self.ptbr_categ[categ]}", self.tts_lang)
+            # fila.put(f"Você escolheu a categoria: {self.ptbr_categ[categ]}")
         else:
-            # play_voice(f"You chose the category: {categ}", self.lang)
-            fila.put(f"You chose the category: {categ}")
+            play_voice(f"You chose the category: {categ}", self.lang)
+            # fila.put(f"You chose the category: {categ}")
         return categ
     
 
