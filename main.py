@@ -119,7 +119,7 @@ class VMobi:
                 categ = qmode.speech_recog()
                 
         if (self.tts_lang == "pt"):
-            play_voice(f"Você escolheu a categoria: {self.ptbr_categ[categ]}", self.tts_lang)
+            play_voice(f"Você escolheu a categoria: {categ}", self.tts_lang)
             # fila.put(f"Você escolheu a categoria: {self.ptbr_categ[categ]}")
         else:
             play_voice(f"You chose the category: {categ}", self.tts_lang)
