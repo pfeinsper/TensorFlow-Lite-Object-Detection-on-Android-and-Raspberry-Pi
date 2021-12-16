@@ -86,17 +86,16 @@ class VMobi:
         qmode = VoiceRecognition(language=self.lang)
         qmode.greetings(fila)
 
-
         record_to_file("audio_recognition/output.wav")
         categ = qmode.speech_recog()
         
-        
         while categ == None or categ == "list" or categ == "least" or (categ not in self.categories) or (categ not in self.pt_to_en_categs.keys()):
             print(categ)
+            print("self.pt_to_en_categs:", self.pt_to_en_categs)
             if categ == None:
                 qmode.repeat("category", fila)
                 record_to_file("audio_recognition/output.wav")
-                # categ = qmode.speech_recog()
+                categ = qmode.speech_recog()
             elif categ == "list" or categ == "least" or categ == "lista" or categ == "categorias":
                 qmode.list_elements(self.categories, fila, self.ptbr_categ)
                 categ = None
@@ -117,8 +116,7 @@ class VMobi:
                     # fila.put("Category not in dataset. Which category do you want?")
 
                 record_to_file("audio_recognition/output.wav")
-
-            categ = qmode.speech_recog()
+                categ = qmode.speech_recog()
                 
         if (self.tts_lang == "pt"):
             play_voice(f"Você escolheu a categoria: {self.ptbr_categ[categ]}", self.tts_lang)
