@@ -148,7 +148,9 @@ def multithreading_queue_checker(lang):
     global fila
     while (True):
         if not fila.empty():
-            play_voice(fila.get(), lang)
+            a = fila.get()
+            print(f"[QUEUE CHECKER] Reading now: {a}")
+            play_voice(a, lang)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
