@@ -86,10 +86,10 @@ class VMobi:
         qmode = VoiceRecognition(language=self.lang)
         qmode.greetings(fila)
 
-        while queue_thread.event.is_set():
-            queue_thread.event.wait(1)
+        while eve.is_set():
+            eve.wait(1)
 
-        if (not queue_thread.event.is_set()):
+        if (not eve.is_set()):
             record_to_file("audio_recognition/output.wav")
             categ = qmode.speech_recog()
         
@@ -105,25 +105,21 @@ class VMobi:
                 categ = None
             elif categ == 'text' or categ == "texto":
                 if (self.tts_lang == "pt"):
-                    # play_voice("Você escolheu a categoria de texto. Iniciando o reconhecimento.")
-                    fila.put("Você escolheu a categoria de texto. Iniciando o reconhecimento.")
+                    play_voice("Você escolheu a categoria de texto. Iniciando o reconhecimento.")
+                    # fila.put("Você escolheu a categoria de texto. Iniciando o reconhecimento.")
                 else:
-                    # play_voice("You chose text category. Start recognizing")
-                    fila.put("You chose text category. Start recognizing")
+                    play_voice("You chose text category. Start recognizing")
+                    # fila.put("You chose text category. Start recognizing")
                 return 'text'
             else:
                 if (self.tts_lang == "pt"):
-                    # play_voice("Categoria não está no dataset. Qual categoria você gostaria de procurar?")
-                    fila.put("Categoria não está no dataset. Qual categoria você gostaria de procurar?")
+                    play_voice("Categoria não está no dataset. Qual categoria você gostaria de procurar?")
+                    # fila.put("Categoria não está no dataset. Qual categoria você gostaria de procurar?")
                 else:
-                    # play_voice("Category not in dataset. Which category do you want?")
-                    fila.put("Category not in dataset. Which category do you want?")
+                    play_voice("Category not in dataset. Which category do you want?")
+                    # fila.put("Category not in dataset. Which category do you want?")
 
-                while queue_thread.event.is_set():
-                    queue_thread.event.wait(1)
-
-                if (not queue_thread.event.is_set()):
-                    record_to_file("audio_recognition/output.wav")
+                record_to_file("audio_recognition/output.wav")
 
             categ = qmode.speech_recog()
                 
@@ -162,14 +158,12 @@ def play_voice(mText, lang="en"):
     os.remove("audio_recognition/voice.wav")
 
 def multithreading_queue_checker(lang):
-    global fila, sem
+    global fila
     while (True):
         if not fila.empty():
-            queue_thread.event.set()
             a = fila.get()
             print(f"[QUEUE CHECKER] Reading now: {a}")
             play_voice(a, lang)
-        queue_thread.event.clear()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -197,8 +191,6 @@ if __name__ == '__main__':
     global fila
     fila = queue.Queue()
 
-    global queue_thread
     queue_thread = Thread(target=multithreading_queue_checker, args=(args.lang[:2],)).start()
-    # Thread(target=thread_check, args=("pt",)).start()
 
     helper = VMobi(args, ptbr_categ)
