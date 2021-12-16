@@ -86,10 +86,10 @@ class VMobi:
         qmode = VoiceRecognition(language=self.lang)
         qmode.greetings(fila)
 
-        while eve.is_set():
-            eve.wait(1)
+        while queue_thread.event.is_set():
+            queue_thread.event.wait(1)
 
-        if (not eve.is_set()):
+        if (not queue_thread.event.is_set()):
             record_to_file("audio_recognition/output.wav")
             categ = qmode.speech_recog()
         
@@ -118,11 +118,11 @@ class VMobi:
                 else:
                     # play_voice("Category not in dataset. Which category do you want?")
                     fila.put("Category not in dataset. Which category do you want?")
-                    
-                while eve.is_set():
-                    eve.wait(1)
 
-                if (not eve.is_set()):
+                while queue_thread.event.is_set():
+                    queue_thread.event.wait(1)
+
+                if (not queue_thread.event.is_set()):
                     record_to_file("audio_recognition/output.wav")
 
             categ = qmode.speech_recog()
@@ -165,11 +165,11 @@ def multithreading_queue_checker(lang):
     global fila, sem
     while (True):
         if not fila.empty():
-            eve.set()
+            queue_thread.event.set()
             a = fila.get()
             print(f"[QUEUE CHECKER] Reading now: {a}")
             play_voice(a, lang)
-        eve.clear()
+        queue_thread.event.clear()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -197,9 +197,8 @@ if __name__ == '__main__':
     global fila
     fila = queue.Queue()
 
-    global eve
-    eve = Thread.Event()
-    Thread(target=multithreading_queue_checker, args=(args.lang[:2],)).start()
+    global queue_thread
+    queue_thread = Thread(target=multithreading_queue_checker, args=(args.lang[:2],)).start()
     # Thread(target=thread_check, args=("pt",)).start()
 
     helper = VMobi(args, ptbr_categ)
