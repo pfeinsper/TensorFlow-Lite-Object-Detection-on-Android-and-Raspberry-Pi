@@ -30,7 +30,7 @@ class VMobi:
         self.tts_lang = args.lang[:2]
         self.east_model_path = os.getcwd() + "/text_recognition/east_model_float16.tflite" # EAST .tflite path for text recognition
         self.ptbr_categ = ptbr_categ
-        Thread(target=self.multithreading_queue_checker).start()
+        # Thread(target=self.multithreading_queue_checker).start()
         self.main() # Runs on the raspberry with buttons on the GPIO
 
 
@@ -123,10 +123,11 @@ class VMobi:
             cat.append(line.replace("\n", ""))
         return cat
     
-    def multithreading_queue_checker(self):
-        while (True):
-            if not fila.empty():
-                play_voice(fila.get(), self.tts_lang)
+def multithreading_queue_checker(lang):
+    global fila
+    while (True):
+        if not fila.empty():
+            play_voice(fila.get(), lang)
 
 
 if __name__ == '__main__':
@@ -154,6 +155,7 @@ if __name__ == '__main__':
 
     global fila
     fila = queue.Queue()
+    Thread(target=multithreading_queue_checker, args=(args.lang[:2],)).start()
     # Thread(target=thread_check, args=("pt",)).start()
 
     helper = VMobi(args, ptbr_categ)
