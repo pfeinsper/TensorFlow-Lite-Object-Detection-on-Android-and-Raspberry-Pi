@@ -58,7 +58,7 @@ class VMobi:
         # Conect button on GPIO2 and Ground
         # Watch out for connenctions in 'pin_layout.svg'
         self.query_button = Button(2, hold_time=2)
-        
+
         detector_args = initialize_detector(self.args)
             
         while (True):
@@ -148,7 +148,9 @@ def play_voice(mText, lang="en"):
 
     tts_audio.save("audio_recognition/voice.wav")
     play(AudioSegment.from_file("audio_recognition/voice.wav"))
-    os.remove("audio_recognition/voice.wav")
+    
+    if (os.path.exists("audio_recognition/voice.wav")):
+        os.remove("audio_recognition/voice.wav")
 
 def multithreading_queue_checker(lang):
     global fila
