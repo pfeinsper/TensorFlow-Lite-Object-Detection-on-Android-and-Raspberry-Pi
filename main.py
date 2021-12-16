@@ -58,10 +58,7 @@ class VMobi:
         # Conect button on GPIO2 and Ground
         # Watch out for connenctions in 'pin_layout.svg'
         self.query_button = Button(2, hold_time=2)
-
-        # Running the safari mode to run on the background
-        # thread_safari_mode = threading.Thread(target=initialize_detector, args=(self.args,))
-        # thread_safari_mode.start()
+        
         detector_args = initialize_detector(self.args)
             
         while (True):

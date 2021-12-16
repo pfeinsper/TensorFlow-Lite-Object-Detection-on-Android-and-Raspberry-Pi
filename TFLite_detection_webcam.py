@@ -288,7 +288,7 @@ def query_mode(args, query_obj, query_btn, fila, lang="en", ptbr_categ=None):
 
         # Press 'q' to quit
         if cv2.waitKey(1) == ord('q') or breakFlag or query_btn.is_held:
-            if (lang=="pt"):
+            if (lang[:2]=="pt"):
                 # play_voice("Retornando ao Modo Safari")
                 fila.put("Retornando ao Modo Safari")
             else:
