@@ -89,7 +89,7 @@ class VMobi:
         record_to_file("audio_recognition/output.wav")
         categ = qmode.speech_recog()
         
-        while categ == None or categ == "list" or categ == "least" or (categ not in self.categories) or (categ not in self.pt_to_en_categs.keys()):
+        while categ == None or categ == "list" or categ == "least" or ((categ not in self.categories) and (categ not in self.pt_to_en_categs.keys())):
             print(categ)
             print("self.pt_to_en_categs:", self.pt_to_en_categs)
             if categ == None:
