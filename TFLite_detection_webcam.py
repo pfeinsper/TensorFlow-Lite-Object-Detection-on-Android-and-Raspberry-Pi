@@ -14,12 +14,9 @@
 # I added my own method of drawing boxes and labels using OpenCV.
 
 # Import packages
-import os
-import argparse
-import cv2
+import os, argparse, cv2
 import numpy as np
-import sys
-import time
+import sys, time, queue
 from threading import Thread
 import importlib.util
 
@@ -72,7 +69,7 @@ class VideoStream:
         print("Stopping videostream")
         self.stopped = True
 
-def safari_mode(args, query_button, lang="en", ptbr_categ=None):
+def safari_mode(args, query_button, fila, lang="en", ptbr_categ=None):
     """Runs the Safari Mode; args is a tuple"""
     interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels = args
 
@@ -84,9 +81,11 @@ def safari_mode(args, query_button, lang="en", ptbr_categ=None):
     videostream = VideoStream(resolution=(imW,imH),framerate=30).start()
     time.sleep(1)
     if (lang=="pt-br"):
-        play_voice("Modo safari foi ativado", lang=lang[:2])
+        # play_voice("Modo safari foi ativado", lang=lang[:2])
+        fila.put("Modo safari foi ativado")
     else:
-        play_voice("Safari mode is activated")
+        # play_voice("Safari mode is activated")
+        fila.put("Safari mode is activated")
     #for frame1 in camera.capture_continuous(rawCapture, format="bgr",use_video_port=True):
     out = 0
     while True:
@@ -132,19 +131,25 @@ def safari_mode(args, query_button, lang="en", ptbr_categ=None):
                 if (scores[i] > 0.8):
                     if ((xmin + xmax)/2 > 2*imW/3):
                         if (lang == "pt-br"):
-                            play_voice(f"{ptbr_categ[object_name]} à sua direita", lang[:2])
+                            # play_voice(f"{ptbr_categ[object_name]} à sua direita", lang[:2])
+                            fila.put(f"{ptbr_categ[object_name]} à sua direita")
                         else:
-                            play_voice(f"{object_name} at your right")
+                            # play_voice(f"{object_name} at your right")
+                            fila.put(f"{object_name} at your right")
                     elif ((xmin + xmax)/2 < imW/3):
                         if (lang == "pt-br"):
-                            play_voice(f"{ptbr_categ[object_name]} à sua esquerda", lang[:2])
+                            # play_voice(f"{ptbr_categ[object_name]} à sua esquerda", lang[:2])
+                            fila.put(f"{ptbr_categ[object_name]} à sua esquerda")
                         else:
-                            play_voice(f"{object_name} at your left")
+                            # play_voice(f"{object_name} at your left")
+                            fila.put(f"{object_name} at your left")
                     else:
                         if (lang == "pt-br"):
-                            play_voice(f"{ptbr_categ[object_name]} à sua frente", lang[:2])
+                            # play_voice(f"{ptbr_categ[object_name]} à sua frente", lang[:2])
+                            fila.put(f"{ptbr_categ[object_name]} à sua frente")
                         else:
-                            play_voice(f"{object_name} in front of you")
+                            # play_voice(f"{object_name} in front of you")
+                            fila.put(f"{object_name} in front of you")
 
                 # Draw label
                 
@@ -179,7 +184,7 @@ def safari_mode(args, query_button, lang="en", ptbr_categ=None):
     # if t.do_run:
     #     t.do_run = False
 
-def query_mode(args, query_obj, query_btn, lang="en", ptbr_categ=None):
+def query_mode(args, query_obj, query_btn, fila, lang="en", ptbr_categ=None):
     """Runs the query mode"""
     interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels = args
 
@@ -243,19 +248,25 @@ def query_mode(args, query_obj, query_btn, lang="en", ptbr_categ=None):
                     if (counter >= 3):
                         if ((xmin + xmax)/2 > 2*imW/3):
                             if (lang == "pt-br"):
-                                play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua direita.", lang[:2])
+                                # play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua direita.", lang[:2])
+                                fila.put(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua direita.")
                             else:
-                                play_voice(f"Found the {query_obj}! It is at your right.")
+                                # play_voice(f"Found the {query_obj}! It is at your right.")
+                                fila.put(f"Found the {query_obj}! It is at your right.")
                         elif ((xmin + xmax)/2 < imW/3):
                             if (lang == "pt-br"):
-                                play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua esquerda.", lang[:2])
+                                # play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua esquerda.", lang[:2])
+                                fila.put(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua esquerda.")
                             else:
-                                play_voice(f"Found the {query_obj}! It is at your left.")
+                                # play_voice(f"Found the {query_obj}! It is at your left.")
+                                fila.put(f"Found the {query_obj}! It is at your left.")
                         else:
                             if (lang == "pt-br"):
-                                play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua frente.", lang[:2])
+                                # play_voice(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua frente.", lang[:2])
+                                fila.put(f"Achei o objeto {ptbr_categ[query_obj]}! Está à sua frente.")
                             else:
-                                play_voice(f"Found the {query_obj}! It is in front of you.")
+                                # play_voice(f"Found the {query_obj}! It is in front of you.")
+                                fila.put(f"Found the {query_obj}! It is in front of you.")
                         breakFlag = True
                         break
                     counter += 1
@@ -276,9 +287,11 @@ def query_mode(args, query_obj, query_btn, lang="en", ptbr_categ=None):
         # Press 'q' to quit
         if cv2.waitKey(1) == ord('q') or breakFlag or query_btn.is_held:
             if (lang=="pt"):
-                play_voice("Retornando ao Modo Safari")
+                # play_voice("Retornando ao Modo Safari")
+                fila.put("Retornando ao Modo Safari")
             else:
-                play_voice("Returning to Safari Mode")
+                # play_voice("Returning to Safari Mode")
+                fila.put("Returning to Safari Mode")
             break
 
     # Clean up
@@ -354,6 +367,3 @@ def initialize_detector(args):
     input_std = 127.5
     args = (interpreter, imW, imH, width, height, floating_model, input_mean, input_std, input_details, output_details, min_conf_threshold, labels)
     return args
-
-
-        

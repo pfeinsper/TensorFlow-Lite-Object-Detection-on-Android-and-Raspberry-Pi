@@ -1,5 +1,8 @@
 from logging import captureWarnings
-import os, time, argparse, json
+import os, time, argparse, json, queue
+
+# Threading
+import threading as Thread
 
 # GPIO - Pi Buttons
 from gpiozero import Button
@@ -48,7 +51,7 @@ class VMobi:
         detector_args = initialize_detector(self.args)
             
         while (True):
-            s = safari_mode(detector_args, self.query_button, lang=self.lang, ptbr_categ=self.ptbr_categ)
+            s = safari_mode(detector_args, self.query_button, fila=fila, lang=self.lang, ptbr_categ=self.ptbr_categ)
             if s > 0:
                 # Enter Query Mode
                 query_cat = self.query_mode_voice_type() # Get the category with voice command
@@ -56,7 +59,7 @@ class VMobi:
                     main_text_detection(self.east_model_path, self.query_button)
                     continue
                 else:
-                    query_mode(detector_args, query_cat, query_btn=self.query_button, lang=self.lang, ptbr_categ=self.ptbr_categ)
+                    query_mode(detector_args, query_cat, query_btn=self.query_button, fila=fila, lang=self.lang, ptbr_categ=self.ptbr_categ)
                     continue
             
 
@@ -79,21 +82,27 @@ class VMobi:
                 categ = None
             elif categ == 'text':
                 if (self.tts_lang == "pt"):
-                    play_voice("Você escolheu a categoria de texto. Iniciando o reconhecimento.")
+                    # play_voice("Você escolheu a categoria de texto. Iniciando o reconhecimento.")
+                    fila.put("Você escolheu a categoria de texto. Iniciando o reconhecimento.")
                 else:
-                    play_voice("You chose text category. Start recognizing")
+                    # play_voice("You chose text category. Start recognizing")
+                    fila.put("You chose text category. Start recognizing")
                 return 'text'
             else:
                 if (self.tts_lang == "pt"):
-                    play_voice("Categoria não está no dataset. Qual categoria você gostaria de procurar?")
+                    # play_voice("Categoria não está no dataset. Qual categoria você gostaria de procurar?")
+                    fila.put("Categoria não está no dataset. Qual categoria você gostaria de procurar?")
                 else:
-                    play_voice("Category not in dataset. Which category do you want?")
+                    # play_voice("Category not in dataset. Which category do you want?")
+                    fila.put("Category not in dataset. Which category do you want?")
                 record_to_file("audio_recognition/output.wav")
                 
         if (self.tts_lang == "pt"):
-            play_voice(f"Você escolheu a categoria: {self.ptbr_categ[categ]}", self.tts_lang)
+            # play_voice(f"Você escolheu a categoria: {self.ptbr_categ[categ]}", self.tts_lang)
+            fila.put(f"Você escolheu a categoria: {self.ptbr_categ[categ]}")
         else:
-            play_voice(f"You chose the category: {categ}", self.lang)
+            # play_voice(f"You chose the category: {categ}", self.lang)
+            fila.put(f"You chose the category: {categ}")
         return categ
     
 
@@ -112,6 +121,12 @@ class VMobi:
                 continue
             cat.append(line.replace("\n", ""))
         return cat
+    
+def thread_check(lang):
+    global fila
+    while (True):
+        if not fila.empty():
+            play_voice(fila.get(), lang)
 
 
 if __name__ == '__main__':
@@ -136,5 +151,9 @@ if __name__ == '__main__':
 
     with open('locales/ptbr.json') as json_file:
         ptbr_categ = json.load(json_file)
+
+    global fila
+    fila = queue.Queue()
+    Thread(target=thread_check, args=(args.lang[:2])).start()
 
     helper = VMobi(args, ptbr_categ)
