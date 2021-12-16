@@ -61,6 +61,9 @@ class VoiceRecognition():
         # fila.put("Which {} do you want?".format(typeof))
 
     def greetings(self, fila=None):
+        if (os.path.exists("audio_recognition/voice.wav")):
+            os.remove("audio_recognition/voice.wav")
+            
         if (self.language == "pt-br"):
             play_voice("Modo Query ativado. Qual categoria você gostaria de procurar?", self.language[:2])
             # fila.put("Modo Query ativado. Qual categoria você gostaria de procurar?")

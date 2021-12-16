@@ -83,9 +83,7 @@ class VMobi:
     def query_mode_voice_type(self):
         """Query  mode that uses voice recognition and only the query button"""
         print("Entering query mode with voice recognition. (Type 2)")
-        if (os.path.exists("audio_recognition/voice.wav")):
-            os.remove("audio_recognition/voice.wav")
-            
+
         qmode = VoiceRecognition(language=self.lang)
         qmode.greetings(fila)
 
