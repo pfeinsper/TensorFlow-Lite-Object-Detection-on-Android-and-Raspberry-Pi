@@ -102,7 +102,7 @@ class VMobi:
                 categ = None
             elif categ == 'text' or categ == "texto":
                 if (self.tts_lang == "pt"):
-                    play_voice("Você escolheu a categoria de texto. Iniciando o reconhecimento.")
+                    play_voice("Você escolheu a categoria de texto. Iniciando o reconhecimento.", self.tts_lang)
                     # fila.put("Você escolheu a categoria de texto. Iniciando o reconhecimento.")
                 else:
                     play_voice("You chose text category. Start recognizing")
@@ -110,7 +110,7 @@ class VMobi:
                 return 'text'
             else:
                 if (self.tts_lang == "pt"):
-                    play_voice("Categoria não está no dataset. Qual categoria você gostaria de procurar?")
+                    play_voice("Categoria não está no dataset. Qual categoria você gostaria de procurar?", self.tts_lang)
                     # fila.put("Categoria não está no dataset. Qual categoria você gostaria de procurar?")
                 else:
                     play_voice("Category not in dataset. Which category do you want?")
@@ -124,7 +124,7 @@ class VMobi:
             play_voice(f"Você escolheu a categoria: {self.ptbr_categ[categ]}", self.tts_lang)
             # fila.put(f"Você escolheu a categoria: {self.ptbr_categ[categ]}")
         else:
-            play_voice(f"You chose the category: {categ}", self.lang)
+            play_voice(f"You chose the category: {categ}", self.tts_lang)
             # fila.put(f"You chose the category: {categ}")
         return categ
     
