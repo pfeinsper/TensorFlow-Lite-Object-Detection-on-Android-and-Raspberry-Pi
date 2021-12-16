@@ -16,7 +16,8 @@ def play_voice(mText, lang="en"):
 
     tts_audio.save("audio_recognition/voice.wav")
     play(AudioSegment.from_file("audio_recognition/voice.wav"))
-    try:
+    
+    if (os.path.exists("audio_recognition/voice.wav")):
         os.remove("audio_recognition/voice.wav")
 
 # def play_voice(mText, lang='en'):
