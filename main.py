@@ -68,8 +68,9 @@ class VMobi:
             s = safari_mode(detector_args, self.query_button, fila=fila, lang=self.lang, ptbr_categ=self.ptbr_categ)
             if s > 0:
                 # Enter Query Mode
+                fila.queue.clear() # Clear the queue to get right on the query mode
                 query_cat = self.query_mode_voice_type() # Get the category with voice command
-                if (self.tts_lang == "pt" and query_cat not in ["texto", "lista", "categorias"]):
+                if (self.tts_lang == "pt"):
                     query_cat = self.pt_to_en_categs[query_cat]
                 if query_cat == 'text':
                     main_text_detection(self.east_model_path, self.query_button)
@@ -92,7 +93,7 @@ class VMobi:
             if categ == None:
                 qmode.repeat("category", fila)
                 record_to_file("audio_recognition/output.wav")
-                categ = qmode.speech_recog()
+                # categ = qmode.speech_recog()
             elif categ == "list" or categ == "least" or categ == "lista" or categ == "categorias":
                 qmode.list_elements(self.categories, fila, self.ptbr_categ)
                 categ = None
@@ -112,6 +113,7 @@ class VMobi:
                     # play_voice("Category not in dataset. Which category do you want?")
                     fila.put("Category not in dataset. Which category do you want?")
                 record_to_file("audio_recognition/output.wav")
+            categ = qmode.speech_recog()
                 
         if (self.tts_lang == "pt"):
             # play_voice(f"Você escolheu a categoria: {self.ptbr_categ[categ]}", self.tts_lang)
