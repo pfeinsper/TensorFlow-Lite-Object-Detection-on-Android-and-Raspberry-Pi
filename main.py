@@ -42,6 +42,7 @@ class VMobi:
         self.tts_lang = args.lang[:2]
         self.east_model_path = os.getcwd() + "/text_recognition/east_model_float16.tflite" # EAST .tflite path for text recognition
         self.ptbr_categ = ptbr_categ
+        self.pt_to_en_categs = {v: k for k, v in ptbr_categ.items()}
         # Thread(target=self.multithreading_queue_checker).start()
         self.main() # Runs on the raspberry with buttons on the GPIO
 
@@ -68,6 +69,8 @@ class VMobi:
             if s > 0:
                 # Enter Query Mode
                 query_cat = self.query_mode_voice_type() # Get the category with voice command
+                if (self.tts_lang == "pt" and query_cat not in ["texto", "lista", "categorias"]):
+                    query_cat = self.pt_to_en_categs[query_cat]
                 if query_cat == 'text':
                     main_text_detection(self.east_model_path, self.query_button)
                     continue
@@ -80,20 +83,20 @@ class VMobi:
         """Query  mode that uses voice recognition and only the query button"""
         print("Entering query mode with voice recognition. (Type 2)")
         qmode = VoiceRecognition(language=self.lang)
-        qmode.greetings()
+        qmode.greetings(fila)
         record_to_file("audio_recognition/output.wav")
         categ = qmode.speech_recog()
         
-        while categ == None or categ == "list" or categ == "least" or (categ not in self.categories):
+        while categ == None or categ == "list" or categ == "least" or (categ not in self.categories) or (categ not in self.pt_to_en_categs.keys()):
             print(categ)
             if categ == None:
-                qmode.repeat("category")
+                qmode.repeat("category", fila)
                 record_to_file("audio_recognition/output.wav")
                 categ = qmode.speech_recog()
-            elif categ == "list" or categ == "least":
-                qmode.list_elements(self.categories, self.ptbr_categ)
+            elif categ == "list" or categ == "least" or categ == "lista" or categ == "categorias":
+                qmode.list_elements(self.categories, fila, self.ptbr_categ)
                 categ = None
-            elif categ == 'text':
+            elif categ == 'text' or categ == "texto":
                 if (self.tts_lang == "pt"):
                     # play_voice("Você escolheu a categoria de texto. Iniciando o reconhecimento.")
                     fila.put("Você escolheu a categoria de texto. Iniciando o reconhecimento.")

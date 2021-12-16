@@ -24,7 +24,7 @@ class VoiceRecognition():
                 print(e)
                 return None
             
-    def list_elements(self, list_e, translated_dict=None):
+    def list_elements(self, list_e, fila, translated_dict=None):
         list_elem = ""
         for item in list_e:
             if (self.language == "pt-br"):
@@ -32,11 +32,13 @@ class VoiceRecognition():
                 continue
             list_elem += str(item) +", "
         if (self.language == "pt-br"):
-            play_voice(list_elem, self.language[:2])
+            # play_voice(list_elem, self.language[:2])
+            fila.put(list_elem)
             return
-        play_voice(list_elem, self.language)
+        # play_voice(list_elem, self.language)
+        fila.put(list_elem)
         
-    def list_categories(self, dictionary, translated_dict=None):
+    def list_categories(self, dictionary, fila, translated_dict=None):
         list_categories = ""
         for item in list(dictionary.keys()):
             if (self.language == "pt-br"):
@@ -44,19 +46,25 @@ class VoiceRecognition():
                 continue
             list_categories += str(item) +", "
         if (self.language == "pt-br"):
-            play_voice(list_categories, self.language)[:2]
+            # play_voice(list_categories, self.language)[:2]
+            fila.put(list_categories)
             return
-        play_voice(list_categories, self.language)
+        # play_voice(list_categories, self.language)
+        fila.put(list_categories)
 
-    def repeat(self, typeof):
+    def repeat(self, typeof, fila):
         if (self.language == "pt-br"):
-            play_voice(f"Qual {typeof} você quer?", self.language[:2])
+            # play_voice(f"Qual categoria você gostaria de buscar?", self.language[:2])
+            fila.put(f"Qual categoria você gostaria de buscar?")
             return
-        play_voice("Which {} do you want?".format(typeof), self.language)
+        # play_voice("Which {} do you want?".format(typeof), self.language)
+        fila.put("Which {} do you want?".format(typeof))
 
-    def greetings(self):
+    def greetings(self, fila):
         if (self.language == "pt-br"):
-            play_voice("Modo Query ativado. Qual categoria você gostaria de procurar?", self.language[:2])
+            # play_voice("Modo Query ativado. Qual categoria você gostaria de procurar?", self.language[:2])
+            fila.put("Modo Query ativado. Qual categoria você gostaria de procurar?")
             return
-        play_voice("Query mode activated. Which category do you want?", self.language)
+        # play_voice("Query mode activated. Which category do you want?", self.language)
+        fila.put("Query mode activated. Which category do you want?")
     
