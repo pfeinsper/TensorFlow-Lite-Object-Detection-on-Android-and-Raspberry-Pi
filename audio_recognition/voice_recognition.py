@@ -54,7 +54,7 @@ class VoiceRecognition():
 
     def repeat(self, typeof, fila=None):
         if (self.language == "pt-br"):
-            play_voice(f"Qual categoria você gostaria de buscar?", self.language[:2])
+            play_voice(f"Qual categoria você gostaria de procurar?", self.language[:2])
             # fila.put(f"Qual categoria você gostaria de buscar?")
             return
         play_voice("Which {} do you want?".format(typeof), self.language)
@@ -63,10 +63,10 @@ class VoiceRecognition():
     def greetings(self, fila=None):
         if (os.path.exists("audio_recognition/voice.wav")):
             os.remove("audio_recognition/voice.wav")
-            
+
         if (self.language == "pt-br"):
-            play_voice("Modo Query ativado. Qual categoria você gostaria de procurar?", self.language[:2])
-            # fila.put("Modo Query ativado. Qual categoria você gostaria de procurar?")
+            play_voice("Modo de procura ativado. Qual categoria você gostaria de procurar?", self.language[:2])
+            # fila.put("Modo de procura ativado. Qual categoria você gostaria de procurar?")
             return
         play_voice("Query mode activated. Which category do you want?", self.language)
         # fila.put("Query mode activated. Which category do you want?")
